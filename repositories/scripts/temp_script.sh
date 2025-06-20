@@ -2,10 +2,10 @@
 
 # ===============================================================================
 #
-# Script de Migración de Oh My Zsh a Starship (Multiplataforma para cualquier Mac)
+# Script de Migración de Oh My Zsh a Starship (Multiplataforma Avanzado)
 
-# Autor: Gemini (con IA)
-# Versión: 1.2.0
+# Autor: Fernando Ferrari - fernando.ferrari@gmail.com
+# Versión: 2.0.0
 #
 # Este script automatiza la transición de una configuración de Oh My Zsh
 # a una instalación "pura" de Zsh con Starship, plugins modernos y
@@ -13,8 +13,11 @@
 #
 # Características principales:
 #   - Migración automática y segura (con backup y rollback)
-#   - Instalación de Starship, plugins y herramientas modernas (eza, bat, fd, fzf, ripgrep)
-#   - Compatible con cualquier Mac (Intel o Apple Silicon)
+#   - Instalación de Starship, plugins y herramientas modernas (eza, bat, fd, fzf, ripgrep, zoxide, atuin, navi, etc.)
+#   - Compatible con macOS, Linux y WSL (detección automática)
+#   - Gestión avanzada de perfiles (save, load, export, import, sync)
+#   - Sistema de gamificación (XP, logros, niveles)
+#   - Diagnóstico y seguridad (diagnose, security-check)
 #   - Reporte detallado del estado de la migración y entorno
 #   - Logs claros y manejo robusto de errores
 #   - Seguro para usuarios avanzados y principiantes
@@ -27,7 +30,10 @@
 #   ./zsh_starship_migration.sh status    # Estado actual de la configuración
 #   ./zsh_starship_migration.sh --help    # Ayuda y opciones
 #
-# Requiere Homebrew instalado. Si no lo tienes, instálalo desde https://brew.sh/
+# Requiere gestor de paquetes instalado según plataforma:
+#   - macOS: Homebrew (https://brew.sh/)
+#   - Linux: apt, dnf, pacman
+#   - WSL/Windows: Chocolatey
 #
 # ===============================================================================
 
@@ -48,14 +54,9 @@ readonly C_BLUE='\033[0;34m'
 readonly C_YELLOW='\033[0;93m'
 readonly C_NC='\033[0m' # No Color
 
-readonly SCRIPT_VERSION="1.1.0"
+readonly SCRIPT_VERSION="2.0.0"
 readonly BACKUP_BASE_DIR="$HOME/.config/migration_backup"
 readonly ZSH_PLUGINS_DIR="$HOME/.zsh/plugins"
-
-# Variables de plataforma (se inicializan al inicio)
-PLATFORM=""
-PACKAGE_MANAGER=""
-STAT_CMD=""
 
 # Flags para controlar el comportamiento del script. Se inicializan en 'false'.
 # Se activarán al parsear los argumentos de entrada.
@@ -89,44 +90,6 @@ log_verbose() {
         echo -e "${C_YELLOW}   [VERBOSE] $1${C_NC}"
     fi
 }
-
-# --- INICIALIZACIÓN TEMPRANA DE PLATAFORMA ---
-# Inicializa las variables de plataforma al inicio del script
-init_platform_vars() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        PLATFORM="macos"
-        PACKAGE_MANAGER="brew"
-        STAT_CMD="stat -f"
-        SED_CMD="sed -i ''"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        PLATFORM="linux"
-        if command -v apt >/dev/null 2>&1; then
-            PACKAGE_MANAGER="apt"
-        elif command -v dnf >/dev/null 2>&1; then
-            PACKAGE_MANAGER="dnf"
-        elif command -v pacman >/dev/null 2>&1; then
-            PACKAGE_MANAGER="pacman"
-        else
-            PACKAGE_MANAGER="unknown"
-        fi
-        STAT_CMD="stat -c"
-        SED_CMD="sed -i"
-    elif [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "cygwin"* ]]; then
-        PLATFORM="windows"
-        PACKAGE_MANAGER="choco"
-        STAT_CMD="stat -c"
-        SED_CMD="sed -i"
-    else
-        PLATFORM="unknown"
-        PACKAGE_MANAGER="unknown"
-        STAT_CMD="stat -f"
-        SED_CMD="sed -i"
-    fi
-    export PLATFORM PACKAGE_MANAGER STAT_CMD SED_CMD
-}
-
-# Inicializar variables de plataforma inmediatamente
-init_platform_vars
 
 # --- FUNCIONES CORE DEL SCRIPT ---
 
@@ -730,69 +693,69 @@ export PATH="/usr/local/bin:/usr/local/sbin:\$HOME/.local/bin:\$PATH"
 
 # --- Plugins de Zsh ---
 # Directorio donde se clonan los plugins de Zsh
-MY_ZSH_PLUGINS_DIR="\$HOME/.zsh/plugins"
+ZSH_PLUGINS_DIR="\$HOME/.zsh/plugins"
 
 # Cargar plugins básicos
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-completions/zsh-completions.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-completions/zsh-completions.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-completions/zsh-completions.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-completions/zsh-completions.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-history-substring-search/zsh-history-substring-search.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-you-should-use/you-should-use.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-you-should-use/you-should-use.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-you-should-use/you-should-use.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-you-should-use/you-should-use.plugin.zsh"
 fi
 
 # Cargar plugins avanzados
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-nvm/zsh-nvm.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-nvm/zsh-nvm.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-nvm/zsh-nvm.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-nvm/zsh-nvm.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-pyenv/pyenv.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-pyenv/pyenv.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-pyenv/pyenv.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-pyenv/pyenv.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-autopair/autopair.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-autopair/autopair.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-autopair/autopair.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-autopair/autopair.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-sudo/sudo.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-sudo/sudo.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-sudo/sudo.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-sudo/sudo.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-copyfile/copyfile.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-copyfile/copyfile.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-copyfile/copyfile.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-copyfile/copyfile.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-open-pr/git-open.sh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-open-pr/git-open.sh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-open-pr/git-open.sh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-open-pr/git-open.sh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-docker-aliases/docker.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-docker-aliases/docker.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-docker-aliases/docker.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-docker-aliases/docker.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-git-aliases/git.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-git-aliases/git.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-git-aliases/git.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-git-aliases/git.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-kubectl-aliases/kubectl.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-kubectl-aliases/kubectl.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-kubectl-aliases/kubectl.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-kubectl-aliases/kubectl.plugin.zsh"
 fi
 
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-aws-vault/aws-vault.plugin.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-aws-vault/aws-vault.plugin.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-aws-vault/aws-vault.plugin.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-aws-vault/aws-vault.plugin.zsh"
 fi
 
 # Cargar zsh-syntax-highlighting (DEBE SER EL ÚLTIMO PLUGIN EN CARGARSE)
-if [ -f "\$MY_ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-    source "\$MY_ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+if [ -f "\$ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+    source "\$ZSH_PLUGINS_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 # --- Configuración de FZF (Búsqueda Fuzzy) ---
@@ -1314,41 +1277,43 @@ show_status() {
 
 # Muestra la ayuda del script.
 show_help() {
-    local cmd="$1"
-    if [[ -z "$cmd" ]]; then
-        cat <<EOF
+    # Usar 'cat <<EOF' es una forma limpia de imprimir bloques de texto.
+    cat <<EOF
 Script de Migración de Oh My Zsh a Starship (v${SCRIPT_VERSION})
 
 Uso: ./migrate.sh [comando] [opciones]
 
-Comandos principales:
+Comandos:
   (sin comando)      Ejecuta la migración automática (default).
   rollback           Restaura la configuración de Oh My Zsh desde el último backup.
   status             Muestra el estado actual de la configuración.
   report             Genera un reporte detallado del estado de la migración.
   diagnose           Realiza un diagnóstico del entorno.
   security-check     Realiza un chequeo de seguridad del entorno.
+  
+  # Gestión de Configuraciones
   save-profile <nombre>     Guarda la configuración actual como un perfil.
   load-profile <nombre>     Carga una configuración desde un perfil.
   list-profiles             Lista todos los perfiles disponibles.
   export-profile <nombre>   Exporta un perfil a un archivo.
   import-profile <archivo>  Importa una configuración desde un archivo.
   sync-git <url>           Sincroniza configuraciones con un repositorio Git.
-  list-commands            Lista todos los comandos disponibles.
-  describe <comando>       Muestra ayuda detallada de un comando.
-  tutorial                 Inicia el tutorial interactivo paso a paso.
-  help, -h, --help         Muestra esta ayuda general o de un comando.
+  
+  help, -h, --help   Muestra esta ayuda.
 
 Opciones:
   --dry-run          Muestra lo que haría el script sin ejecutar cambios reales.
   --verbose          Activa el logging detallado para depuración.
   --skip-tools       Migra solo el prompt (Starship) y los plugins, sin instalar herramientas modernas.
 
-Enlaces útiles:
-  Starship: https://starship.rs/config/
-  Zsh: https://zsh.sourceforge.io/Doc/
-  Plugins Zsh: https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins
-  Herramientas modernas: https://github.com/ibraheemdev/modern-unix
+Características Avanzadas:
+  - 9 temas predefinidos (Pastel Powerline, Cyberpunk, Gaming, etc.)
+  - Selección interactiva de plugins y herramientas
+  - Herramientas modernas: zoxide, atuin, navi, tldr, procs, etc.
+  - Plugins avanzados: nvm, pyenv, autopair, sudo, etc.
+  - Gestión de perfiles y sincronización Git
+  - Validación automática post-migración
+  - Backup automático con rollback
 
 Ejemplos:
   ./migrate.sh                    # Migración completa interactiva
@@ -1356,126 +1321,7 @@ Ejemplos:
   ./migrate.sh save-profile work  # Guardar perfil de trabajo
   ./migrate.sh load-profile dev   # Cargar perfil de desarrollo
   ./migrate.sh list-profiles      # Ver perfiles disponibles
-  ./migrate.sh help report        # Ayuda detallada de 'report'
-  ./migrate.sh tutorial           # Iniciar tutorial interactivo
 EOF
-    else
-        describe_command "$cmd"
-    fi
-}
-
-# Lista todos los comandos disponibles
-list_commands() {
-    cat <<EOF
-Comandos disponibles:
-  rollback
-  status
-  report
-  diagnose
-  security-check
-  save-profile
-  load-profile
-  list-profiles
-  export-profile
-  import-profile
-  sync-git
-  list-commands
-  describe
-  tutorial
-  help
-EOF
-}
-
-# Describe un comando en detalle
-describe_command() {
-    local cmd="$1"
-    case "$cmd" in
-        rollback)
-            echo "rollback: Restaura la configuración de Oh My Zsh desde el último backup."
-            echo "Ejemplo: ./migrate.sh rollback"
-            ;;
-        status)
-            echo "status: Muestra el estado actual de la configuración."
-            echo "Ejemplo: ./migrate.sh status"
-            ;;
-        report)
-            echo "report: Genera un reporte detallado del estado de la migración, diagnóstico y seguridad."
-            echo "Ejemplo: ./migrate.sh report"
-            ;;
-        diagnose)
-            echo "diagnose: Realiza un diagnóstico rápido del entorno (herramientas, plugins, archivos, permisos)."
-            echo "Ejemplo: ./migrate.sh diagnose"
-            ;;
-        security-check)
-            echo "security-check: Realiza un chequeo de seguridad e integridad de archivos y configuraciones."
-            echo "Ejemplo: ./migrate.sh security-check"
-            ;;
-        save-profile)
-            echo "save-profile <nombre>: Guarda la configuración actual como un perfil."
-            echo "Ejemplo: ./migrate.sh save-profile trabajo"
-            ;;
-        load-profile)
-            echo "load-profile <nombre>: Carga una configuración desde un perfil guardado."
-            echo "Ejemplo: ./migrate.sh load-profile trabajo"
-            ;;
-        list-profiles)
-            echo "list-profiles: Lista todos los perfiles de configuración guardados."
-            echo "Ejemplo: ./migrate.sh list-profiles"
-            ;;
-        export-profile)
-            echo "export-profile <nombre>: Exporta un perfil a un archivo."
-            echo "Ejemplo: ./migrate.sh export-profile trabajo"
-            ;;
-        import-profile)
-            echo "import-profile <archivo>: Importa una configuración desde un archivo."
-            echo "Ejemplo: ./migrate.sh import-profile trabajo.tar.gz"
-            ;;
-        sync-git)
-            echo "sync-git <url>: Sincroniza configuraciones con un repositorio Git."
-            echo "Ejemplo: ./migrate.sh sync-git git@github.com:usuario/dotfiles.git"
-            ;;
-        list-commands)
-            echo "list-commands: Lista todos los comandos disponibles."
-            echo "Ejemplo: ./migrate.sh list-commands"
-            ;;
-        describe)
-            echo "describe <comando>: Muestra ayuda detallada de un comando."
-            echo "Ejemplo: ./migrate.sh describe report"
-            ;;
-        tutorial)
-            echo "tutorial: Inicia el tutorial interactivo paso a paso para la migración y configuración."
-            echo "Ejemplo: ./migrate.sh tutorial"
-            ;;
-        help|-h|--help)
-            echo "help [comando]: Muestra la ayuda general o la ayuda de un comando específico."
-            echo "Ejemplo: ./migrate.sh help report"
-            ;;
-        *)
-            echo "Comando no reconocido: $cmd"
-            list_commands
-            ;;
-    esac
-}
-
-# Tutorial interactivo paso a paso
-run_tutorial() {
-    echo "================ TUTORIAL INTERACTIVO ================"
-    echo "Este tutorial te guiará paso a paso en la migración y configuración."
-    echo "Pulsa Enter para avanzar en cada paso."
-    echo "\n1. Backup: Se recomienda crear un backup antes de cualquier cambio. Pulsa Enter para continuar..."; read
-    create_backup
-    echo "Backup creado."
-    echo "\n2. Selección de plugins: Elige los plugins de Zsh que deseas instalar. Pulsa Enter para continuar..."; read
-    select_zsh_plugins
-    echo "\n3. Selección de herramientas modernas: Elige las herramientas modernas a instalar. Pulsa Enter para continuar..."; read
-    select_starship_features
-    echo "\n4. Instalación de dependencias. Pulsa Enter para continuar..."; read
-    install_dependencies
-    echo "\n5. Generación de configuración y migración. Pulsa Enter para continuar..."; read
-    generate_new_config
-    echo "\n6. Validación post-migración. Pulsa Enter para continuar..."; read
-    post_migration_validation
-    echo "\n¡Tutorial finalizado! Puedes consultar la ayuda con './migrate.sh help' o explorar más comandos."
 }
 
 # Genera un reporte detallado del estado de la migración.
@@ -1810,386 +1656,6 @@ get_gamification_value() {
     grep -o '"'"$key"'": *[0-9]*' "$GAMIFICATION_FILE" | grep -o '[0-9]*'
 }
 
-# --- FUNCIONES DE GESTIÓN DE CONFIGURACIONES ---
-
-# Guarda la configuración actual como un perfil
-save_configuration_profile() {
-    local profile_name="$1"
-    if [[ -z "$profile_name" ]]; then
-        log_error "Debe especificar un nombre para el perfil."
-        return 1
-    fi
-    
-    local profile_dir="$HOME/.config/starship_profiles/$profile_name"
-    local timestamp=$(date +'%Y%m%d_%H%M%S')
-    
-    log_info "Guardando perfil: $profile_name"
-    
-    if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se crearía el perfil en: $profile_dir"
-        return
-    fi
-    
-    mkdir -p "$profile_dir"
-    
-    # Guardar configuración de Starship
-    if [[ -f "$HOME/.config/starship.toml" ]]; then
-        cp "$HOME/.config/starship.toml" "$profile_dir/starship.toml"
-    fi
-    
-    # Guardar .zshrc
-    if [[ -f "$HOME/.zshrc" ]]; then
-        cp "$HOME/.zshrc" "$profile_dir/zshrc"
-    fi
-    
-    # Guardar metadatos del perfil
-    cat > "$profile_dir/metadata.json" <<EOF
-{
-    "name": "$profile_name",
-    "created": "$timestamp",
-    "description": "Perfil creado automáticamente",
-    "version": "$SCRIPT_VERSION",
-    "theme": "$STARSHIP_THEME",
-    "plugins": {
-        "autosuggestions": $INSTALL_AUTOSUGGESTIONS,
-        "syntax_highlighting": $INSTALL_SYNTAX_HIGHLIGHTING,
-        "completions": $INSTALL_COMPLETIONS,
-        "history_substring": $INSTALL_HISTORY_SUBSTRING,
-        "you_should_use": $INSTALL_YOU_SHOULD_USE
-    }
-}
-EOF
-    
-    log_success "Perfil '$profile_name' guardado en: $profile_dir"
-}
-
-# Carga una configuración desde un perfil
-load_configuration_profile() {
-    local profile_name="$1"
-    if [[ -z "$profile_name" ]]; then
-        log_error "Debe especificar un nombre de perfil."
-        return 1
-    fi
-    
-    local profile_dir="$HOME/.config/starship_profiles/$profile_name"
-    
-    if [[ ! -d "$profile_dir" ]]; then
-        log_error "El perfil '$profile_name' no existe."
-        return 1
-    fi
-    
-    log_info "Cargando perfil: $profile_name"
-    
-    if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se cargaría el perfil desde: $profile_dir"
-        return
-    fi
-    
-    # Crear backup antes de cargar
-    create_backup
-    
-    # Cargar configuración de Starship
-    if [[ -f "$profile_dir/starship.toml" ]]; then
-        cp "$profile_dir/starship.toml" "$HOME/.config/starship.toml"
-        log_verbose "Configuración de Starship cargada."
-    fi
-    
-    # Cargar .zshrc
-    if [[ -f "$profile_dir/zshrc" ]]; then
-        cp "$profile_dir/zshrc" "$HOME/.zshrc"
-        log_verbose "Configuración de Zsh cargada."
-    fi
-    
-    log_success "Perfil '$profile_name' cargado exitosamente."
-    log_info "Reinicia tu terminal o ejecuta 'source ~/.zshrc' para aplicar los cambios."
-}
-
-# Lista todos los perfiles disponibles
-list_configuration_profiles() {
-    local profiles_dir="$HOME/.config/starship_profiles"
-    
-    if [[ ! -d "$profiles_dir" ]]; then
-        log_info "No hay perfiles guardados."
-        return
-    fi
-    
-    log_info "Perfiles disponibles:"
-    for profile_dir in "$profiles_dir"/*; do
-        if [[ -d "$profile_dir" ]]; then
-            local profile_name=$(basename "$profile_dir")
-            local metadata_file="$profile_dir/metadata.json"
-            
-            if [[ -f "$metadata_file" ]]; then
-                local description=$(grep -o '"description": "[^"]*"' "$metadata_file" | cut -d'"' -f4)
-                local created=$(grep -o '"created": "[^"]*"' "$metadata_file" | cut -d'"' -f4)
-                echo -e "  ${C_GREEN}$profile_name${C_NC} - $description (Creado: $created)"
-            else
-                echo -e "  ${C_GREEN}$profile_name${C_NC} - Sin metadatos"
-            fi
-        fi
-    done
-}
-
-# Exporta una configuración a un archivo
-export_configuration() {
-    local profile_name="$1"
-    local export_path="$2"
-    
-    if [[ -z "$profile_name" ]]; then
-        log_error "Debe especificar un nombre de perfil."
-        return 1
-    fi
-    
-    if [[ -z "$export_path" ]]; then
-        export_path="$HOME/Desktop/starship_config_${profile_name}_$(date +'%Y%m%d_%H%M%S').tar.gz"
-    fi
-    
-    local profile_dir="$HOME/.config/starship_profiles/$profile_name"
-    
-    if [[ ! -d "$profile_dir" ]]; then
-        log_error "El perfil '$profile_name' no existe."
-        return 1
-    fi
-    
-    log_info "Exportando perfil '$profile_name' a: $export_path"
-    
-    if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se exportaría el perfil a: $export_path"
-        return
-    fi
-    
-    tar -czf "$export_path" -C "$profile_dir" .
-    
-    if [[ $? -eq 0 ]]; then
-        log_success "Perfil exportado exitosamente a: $export_path"
-    else
-        log_error "Error al exportar el perfil."
-        return 1
-    fi
-}
-
-# Importa una configuración desde un archivo
-import_configuration() {
-    local import_path="$1"
-    local profile_name="$2"
-    
-    if [[ -z "$import_path" ]]; then
-        log_error "Debe especificar la ruta del archivo a importar."
-        return 1
-    fi
-    
-    if [[ -z "$profile_name" ]]; then
-        profile_name="imported_$(date +'%Y%m%d_%H%M%S')"
-    fi
-    
-    if [[ ! -f "$import_path" ]]; then
-        log_error "El archivo '$import_path' no existe."
-        return 1
-    fi
-    
-    local profile_dir="$HOME/.config/starship_profiles/$profile_name"
-    
-    log_info "Importando configuración como perfil: $profile_name"
-    
-    if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se importaría el archivo a: $profile_dir"
-        return
-    fi
-    
-    mkdir -p "$profile_dir"
-    tar -xzf "$import_path" -C "$profile_dir"
-    
-    if [[ $? -eq 0 ]]; then
-        log_success "Configuración importada exitosamente como perfil: $profile_name"
-    else
-        log_error "Error al importar la configuración."
-        return 1
-    fi
-}
-
-# Sincroniza configuraciones con un repositorio Git
-sync_configuration_with_git() {
-    local repo_url="$1"
-    local sync_dir="$HOME/.config/starship_sync"
-    
-    if [[ -z "$repo_url" ]]; then
-        log_error "Debe especificar la URL del repositorio Git."
-        return 1
-    fi
-    
-    log_info "Sincronizando configuraciones con Git: $repo_url"
-    
-    if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se sincronizaría con: $repo_url"
-        return
-    fi
-    
-    # Clonar o actualizar repositorio
-    if [[ -d "$sync_dir" ]]; then
-        cd "$sync_dir"
-        git pull origin main >/dev/null 2>&1 || git pull origin master >/dev/null 2>&1
-    else
-        git clone "$repo_url" "$sync_dir" >/dev/null 2>&1
-    fi
-    
-    if [[ $? -eq 0 ]]; then
-        log_success "Configuraciones sincronizadas con Git exitosamente."
-    else
-        log_error "Error al sincronizar con Git."
-        return 1
-    fi
-}
-
-# --- FUNCIÓN SED INPLACE SEGURA MULTIPLATAFORMA ---
-safe_sed_inplace() {
-    local expr="$1"
-    local file="$2"
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' -e "$expr" "$file"
-    else
-        sed -i -e "$expr" "$file"
-    fi
-}
-
-# --- BÚSQUEDA E INSTALACIÓN DE TEMAS DE STARSHIP ---
-# Función para mostrar el tema actual
-show_current_theme() {
-    local current_theme=""
-    
-    # Buscar tema en la configuración de Starship
-    if [[ -f "$HOME/.config/starship.toml" ]]; then
-        current_theme=$(grep -E '^theme\s*=' "$HOME/.config/starship.toml" | sed 's/theme\s*=\s*"\([^"]*\)"/\1/')
-    fi
-    
-    if [[ -n "$current_theme" ]]; then
-        echo -e "${C_GREEN}🎨 Tema actual: ${C_BLUE}$current_theme${C_NC}"
-        
-        # Verificar si el tema está instalado
-        local theme_file="$HOME/.config/starship/themes/${current_theme}.toml"
-        if [[ -f "$theme_file" ]]; then
-            echo -e "   📁 Archivo: ${C_YELLOW}$theme_file${C_NC}"
-        else
-            echo -e "   ⚠️  Archivo del tema no encontrado"
-        fi
-    else
-        echo -e "${C_YELLOW}🎨 Tema actual: ${C_BLUE}Predeterminado de Starship${C_NC}"
-    fi
-    echo ""
-}
-
-search_starship_themes() {
-    log_info "🔍 Buscando temas populares de Starship..."
-    
-    # Mostrar tema actual
-    show_current_theme
-    
-    # Verificar si curl está disponible
-    if ! command -v curl >/dev/null 2>&1; then
-        log_error "curl no está instalado. Instala curl para buscar temas."
-        return 1
-    fi
-    
-    # Buscar temas en GitHub usando la API
-    local search_url="https://api.github.com/search/repositories?q=starship+theme+language:toml&sort=stars&order=desc&per_page=20"
-    
-    log_verbose "Buscando temas en GitHub..."
-    local response
-    response=$(curl -s "$search_url" 2>/dev/null)
-    
-    if [[ $? -ne 0 ]]; then
-        log_error "Error al buscar temas. Verifica tu conexión a internet."
-        return 1
-    fi
-    
-    # Parsear respuesta JSON y extraer información
-    local themes_data
-    themes_data=$(echo "$response" | python3 -c "
-import json, sys
-try:
-    data = json.load(sys.stdin)
-    for repo in data.get('items', []):
-        name = repo['name']
-        description = repo.get('description', 'Sin descripción')
-        stars = repo['stargazers_count']
-        downloads = repo.get('downloads', 0)
-        url = repo['html_url']
-        print(f'{name}|{description}|{stars}|{downloads}|{url}')
-except:
-    print('Error parsing JSON')
-" 2>/dev/null)
-    
-    if [[ -z "$themes_data" ]]; then
-        log_error "No se pudieron obtener los temas."
-        return 1
-    fi
-    
-    # Mostrar temas ordenados por estrellas
-    echo -e "\n${C_BLUE}🎨 Temas Populares de Starship:${C_NC}"
-    echo -e "${C_YELLOW}Ordenados por popularidad (estrellas)${C_NC}\n"
-    
-    local count=1
-    echo "$themes_data" | while IFS='|' read -r name description stars downloads url; do
-        if [[ -n "$name" ]]; then
-            printf "${C_GREEN}%2d.${C_NC} ${C_BLUE}%-30s${C_NC} ⭐ %-6s 📥 %-6s\n" "$count" "$name" "$stars" "$downloads"
-            printf "     ${C_YELLOW}%s${C_NC}\n" "$description"
-            printf "     ${C_NC}URL: %s\n\n" "$url"
-            count=$((count + 1))
-        fi
-    done
-    
-    # Opción para instalar un tema
-    echo -e "${C_BLUE}¿Quieres instalar algún tema? (número o 'n' para saltar):${C_NC}"
-    read -r theme_choice
-    
-    if [[ "$theme_choice" =~ ^[0-9]+$ ]] && [[ "$theme_choice" -ge 1 ]] && [[ "$theme_choice" -le 20 ]]; then
-        local selected_theme
-        selected_theme=$(echo "$themes_data" | sed -n "${theme_choice}p" | cut -d'|' -f1)
-        local theme_url
-        theme_url=$(echo "$themes_data" | sed -n "${theme_choice}p" | cut -d'|' -f5)
-        
-        if [[ -n "$selected_theme" ]]; then
-            install_starship_theme "$selected_theme" "$theme_url"
-            # Mostrar tema actual después de la instalación
-            echo -e "\n${C_BLUE}🎨 Tema actual después de la instalación:${C_NC}"
-            show_current_theme
-        fi
-    else
-        log_info "Saltando instalación de tema."
-    fi
-}
-
-install_starship_theme() {
-    local theme_name="$1"
-    local theme_url="$2"
-    
-    log_info "📦 Instalando tema: $theme_name"
-    
-    # Crear directorio de temas si no existe
-    local themes_dir="$HOME/.config/starship/themes"
-    mkdir -p "$themes_dir"
-    
-    # Descargar tema
-    local theme_file="$themes_dir/${theme_name}.toml"
-    
-    if curl -s -L "$theme_url/raw/main/starship.toml" -o "$theme_file" 2>/dev/null; then
-        log_success "✅ Tema '$theme_name' instalado en: $theme_file"
-        
-        # Actualizar configuración de Starship para usar el tema
-        if [[ -f "$HOME/.config/starship.toml" ]]; then
-            # Agregar referencia al tema en la configuración
-            if ! grep -q "theme = \"$theme_name\"" "$HOME/.config/starship.toml"; then
-                safe_sed_inplace "1i\\\n[theme]\\\ntheme = \"$theme_name\"" "$HOME/.config/starship.toml"
-                log_success "✅ Tema '$theme_name' configurado como predeterminado"
-            fi
-        fi
-        
-        add_gamification_xp 10
-        unlock_achievement "Tema personalizado instalado"
-    else
-        log_error "❌ Error al instalar el tema '$theme_name'"
-    fi
-}
-
 add_gamification_xp() {
     local add_xp="$1"
     local xp=$(get_gamification_value "xp")
@@ -2204,8 +1670,8 @@ add_gamification_xp() {
         level_up=true
     done
     # Actualiza archivo
-    safe_sed_inplace "s/\"xp\": *[0-9]*/\"xp\": $new_xp/" "$GAMIFICATION_FILE"
-    safe_sed_inplace "s/\"level\": *[0-9]*/\"level\": $new_level/" "$GAMIFICATION_FILE"
+    $SED_CMD -e "s/\"xp\": *[0-9]*/\"xp\": $new_xp/" "$GAMIFICATION_FILE"
+    $SED_CMD -e "s/\"level\": *[0-9]*/\"level\": $new_level/" "$GAMIFICATION_FILE"
     if [[ $level_up == true ]]; then
         log_success "🎉 ¡Subiste al nivel $new_level! Sigue personalizando tu terminal."
     fi
@@ -2215,7 +1681,7 @@ unlock_achievement() {
     local achievement="$1"
     if ! grep -q '"'"$achievement"'"' "$GAMIFICATION_FILE"; then
         # Añadir logro
-        safe_sed_inplace "s/\"achievements\": *\[/\"achievements\": [\"$achievement\",/" "$GAMIFICATION_FILE"
+        $SED_CMD -e "s/\"achievements\": *\[/\"achievements\": [\"$achievement\",/" "$GAMIFICATION_FILE"
         log_success "🏅 ¡Logro desbloqueado: $achievement!"
     fi
 }
@@ -2226,123 +1692,6 @@ show_gamification_status() {
     local xp=$(get_gamification_value "xp")
     log_info "Nivel: $level | XP: $xp/100"
     log_info "Logros: $(grep -o '"achievements": *\[[^]]*\]' "$GAMIFICATION_FILE" | sed 's/.*\[//;s/\].*//;s/\"//g')"
-}
-
-# --- DETECCIÓN MULTIPLATAFORMA ---
-detect_platform() {
-    log_verbose "Detectando plataforma..."
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        PLATFORM="macos"
-        PACKAGE_MANAGER="brew"
-        STAT_CMD="stat -f"
-        SED_CMD="sed -i ''"
-        log_verbose "Plataforma detectada: macOS"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        PLATFORM="linux"
-        if command -v apt >/dev/null 2>&1; then
-            PACKAGE_MANAGER="apt"
-        elif command -v dnf >/dev/null 2>&1; then
-            PACKAGE_MANAGER="dnf"
-        elif command -v pacman >/dev/null 2>&1; then
-            PACKAGE_MANAGER="pacman"
-        else
-            PACKAGE_MANAGER="unknown"
-        fi
-        STAT_CMD="stat -c"
-        SED_CMD="sed -i"
-        log_verbose "Plataforma detectada: Linux ($PACKAGE_MANAGER)"
-    elif [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "cygwin"* ]]; then
-        PLATFORM="windows"
-        PACKAGE_MANAGER="choco"
-        STAT_CMD="stat -c"
-        SED_CMD="sed -i"
-        log_verbose "Plataforma detectada: Windows (WSL/Cygwin)"
-    else
-        PLATFORM="unknown"
-        PACKAGE_MANAGER="unknown"
-        STAT_CMD="stat -f"
-        SED_CMD="sed -i"
-        log_warn "Plataforma no reconocida: $OSTYPE"
-    fi
-    export PLATFORM PACKAGE_MANAGER STAT_CMD SED_CMD
-}
-
-# --- VALIDACIÓN MULTIPLATAFORMA ---
-validate_platform() {
-    log_info "Validando plataforma..."
-    case "$PLATFORM" in
-        "macos")
-            if ! command -v brew >/dev/null 2>&1; then
-                log_error "Homebrew no está instalado. Instálalo desde https://brew.sh/"
-                return 1
-            fi
-            ;;
-        "linux")
-            case "$PACKAGE_MANAGER" in
-                "apt")
-                    if ! command -v apt >/dev/null 2>&1; then
-                        log_error "apt no está disponible."
-                        return 1
-                    fi
-                    ;;
-                "dnf")
-                    if ! command -v dnf >/dev/null 2>&1; then
-                        log_error "dnf no está disponible."
-                        return 1
-                    fi
-                    ;;
-                "pacman")
-                    if ! command -v pacman >/dev/null 2>&1; then
-                        log_error "pacman no está disponible."
-                        return 1
-                    fi
-                    ;;
-                *)
-                    log_warn "Gestor de paquetes no reconocido. Algunas funciones pueden no funcionar."
-                    ;;
-            esac
-            ;;
-        "windows")
-            if ! command -v choco >/dev/null 2>&1; then
-                log_warn "Chocolatey no está instalado. Algunas funciones pueden no funcionar."
-            fi
-            ;;
-        *)
-            log_warn "Plataforma no soportada. Algunas funciones pueden no funcionar."
-            ;;
-    esac
-    log_success "Plataforma validada: $PLATFORM ($PACKAGE_MANAGER)"
-}
-
-# --- INSTALACIÓN MULTIPLATAFORMA ---
-install_platform_dependencies() {
-    log_info "Instalando dependencias específicas de la plataforma..."
-    case "$PLATFORM" in
-        "macos")
-            log_verbose "macOS: Dependencias instaladas via Homebrew"
-            ;;
-        "linux")
-            case "$PACKAGE_MANAGER" in
-                "apt")
-                    log_verbose "Instalando dependencias via apt..."
-                    sudo apt update
-                    sudo apt install -y curl git zsh python3 python3-pip
-                    ;;
-                "dnf")
-                    log_verbose "Instalando dependencias via dnf..."
-                    sudo dnf install -y curl git zsh python3 python3-pip
-                    ;;
-                "pacman")
-                    log_verbose "Instalando dependencias via pacman..."
-                    sudo pacman -S --noconfirm curl git zsh python python-pip
-                    ;;
-            esac
-            ;;
-        "windows")
-            log_verbose "Windows: Instalando dependencias via Chocolatey..."
-            choco install -y curl git python
-            ;;
-    esac
 }
 
 # --- DIAGNÓSTICO RÁPIDO ---
@@ -2682,25 +2031,12 @@ sync_configuration_with_git() {
     fi
 }
 
-# --- FUNCIÓN SED INPLACE SEGURA MULTIPLATAFORMA ---
-safe_sed_inplace() {
-    local expr="$1"
-    local file="$2"
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' -e "$expr" "$file"
-    else
-        sed -i -e "$expr" "$file"
-    fi
-}
-
-# --- FUNCION PRINCIPAL (MAIN) ---
+# --- FUNCIÓN PRINCIPAL (MAIN) ---
 # El punto de entrada del script. Parsea los argumentos y llama a la
 # función correspondiente. Es el "director de orquesta".
 main() {
     init_gamification
     detect_platform
-    validate_platform
-    install_platform_dependencies || log_warn "Algunas dependencias de plataforma no se pudieron instalar"
     # Parseo de argumentos. Un bucle `while` con `case` es el patrón más
     # robusto y extensible en shell para manejar argumentos.
     local command=""
@@ -2724,7 +2060,7 @@ main() {
                 show_help
                 exit 0
                 ;;
-            rollback|status|report|diagnose|save-profile|load-profile|list-profiles|export-profile|import-profile|sync-git|security-check|themes|tutorial|describe|list-commands)
+            rollback|status|report|diagnose|save-profile|load-profile|list-profiles|export-profile|import-profile|sync-git|security-check)
                 if [[ -n "$command" ]]; then
                     log_error "Solo se puede especificar un comando a la vez."
                     exit 1
@@ -2792,7 +2128,7 @@ main() {
             log_verbose "Command: $command"
             log_verbose "Command args count: ${#command_args[@]}"
             log_verbose "Command args: ${command_args[*]}"
-            if [[ ${#command_args[@]} -eq 0 ]]; then
+            if [[ ${#command_args} -eq 0 ]]; then
                 log_error "Debe especificar un nombre para el perfil."
                 show_help
                 exit 1
@@ -2802,7 +2138,7 @@ main() {
             unlock_achievement "Perfil guardado"
             ;;
         load-profile)
-            if [[ ${#command_args[@]} -eq 0 ]]; then
+            if [[ ${#command_args} -eq 0 ]]; then
                 log_error "Debe especificar un nombre de perfil."
                 show_help
                 exit 1
@@ -2816,7 +2152,7 @@ main() {
             add_gamification_xp 1
             ;;
         export-profile)
-            if [[ ${#command_args[@]} -eq 0 ]]; then
+            if [[ ${#command_args} -eq 0 ]]; then
                 log_error "Debe especificar un nombre de perfil."
                 show_help
                 exit 1
@@ -2826,7 +2162,7 @@ main() {
             unlock_achievement "Perfil exportado"
             ;;
         import-profile)
-            if [[ ${#command_args[@]} -eq 0 ]]; then
+            if [[ ${#command_args} -eq 0 ]]; then
                 log_error "Debe especificar la ruta del archivo a importar."
                 show_help
                 exit 1
@@ -2836,7 +2172,7 @@ main() {
             unlock_achievement "Perfil importado"
             ;;
         sync-git)
-            if [[ ${#command_args[@]} -eq 0 ]]; then
+            if [[ ${#command_args} -eq 0 ]]; then
                 log_error "Debe especificar la URL del repositorio Git."
                 show_help
                 exit 1
@@ -2849,32 +2185,6 @@ main() {
             security_check
             add_gamification_xp 5
             unlock_achievement "Seguridad verificada"
-            ;;
-        themes)
-            search_starship_themes
-            add_gamification_xp 5
-            unlock_achievement "Temas de Starship buscados"
-            ;;
-        help|-h|--help)
-            if [[ ${#command_args[@]} -gt 0 ]]; then
-                show_help "${command_args[1]}"
-            else
-                show_help
-            fi
-            ;;
-        list-commands)
-            list_commands
-            ;;
-        describe)
-            if [[ ${#command_args[@]} -eq 0 ]]; then
-                log_error "Debe especificar un comando para describir."
-                list_commands
-                exit 1
-            fi
-            describe_command "${command_args[1]}"
-            ;;
-        tutorial)
-            run_tutorial
             ;;
         "") # Comando por defecto: migración
             # Paso 1: Selección de plugins de Zsh
@@ -2914,9 +2224,7 @@ main() {
                 echo -e "\n${C_GREEN}🎉 ¡Migración completada con éxito!${C_NC}"
                 echo -e "   - Backup creado en: ${C_YELLOW}${MIGRATION_BACKUP_PATH}${C_NC}"
                 echo -e "   - Para revertir, ejecuta: ${C_YELLOW}./migrate.sh rollback${C_NC}"
-                echo -e "   - ${C_BLUE}Activando Starship...${C_NC}"
-                source ~/.zshrc
-                echo -e "${C_GREEN}✅ Starship Activado${C_NC}"
+                echo -e "   - ${C_BLUE}Por favor, reinicia tu terminal o ejecuta 'source ~/.zshrc' para ver los cambios.${C_NC}"
                 add_gamification_xp 20
                 unlock_achievement "Migración completada"
             else
@@ -2932,5 +2240,9 @@ main() {
 # preservando espacios si los hubiera, lo que es crucial para un parseo correcto.
 main "$@"
 
-# Función para mostrar el tema actual
-show_current_theme() { echo -e "${C_GREEN}🎨 Tema actual: ${C_BLUE}Predeterminado${C_NC}"; }
+# --- DETECCIÓN MULTIPLATAFORMA ---
+    esac
+}
+
+# --- INTEGRAR EN MAIN ---
+# (Busca el bloque del main y agrega la detección de plataforma al inicio)

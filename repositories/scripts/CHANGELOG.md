@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## [2.0.0] - 2025-06-18
+### Añadido
+- **Sistema de gamificación completo**: XP, logros, niveles y mensajes motivacionales
+- **Gestión avanzada de perfiles**: save-profile, load-profile, list-profiles, export-profile, import-profile
+- **Sincronización con Git**: sync-git para compartir configuraciones entre equipos
+- **Diagnóstico rápido**: comando diagnose para verificar herramientas, plugins y archivos clave
+- **Chequeo de seguridad**: security-check para validar permisos, contenido sospechoso e integridad
+- **Soporte multiplataforma real**: detección automática de macOS, Linux y WSL
+- **Adaptación automática de comandos**: stat, sed y gestores de paquetes según plataforma
+- **Instalación de dependencias multiplataforma**: apt, dnf, pacman, choco según sistema
+- **9 temas Starship avanzados**: Pastel Powerline, Cyberpunk, Gaming, Minimal, etc.
+- **Plugins avanzados**: nvm, pyenv, autopair, sudo, copyfile, git-open, docker-aliases, etc.
+- **Herramientas modernas adicionales**: zoxide, atuin, navi, tldr, procs, dust, btm, gitui, lazygit
+- **Validación multiplataforma**: detección y validación de gestores de paquetes según sistema
+- **Integración de diagnóstico en reportes**: report ahora incluye diagnose y security-check
+
+### Mejorado
+- **Parser de argumentos robusto**: soporte para comandos con parámetros (save-profile, load-profile, etc.)
+- **Sistema de logging mejorado**: mensajes más claros y detallados
+- **Validación de sistema multiplataforma**: adaptación automática según plataforma detectada
+- **Gestión de errores mejorada**: mejor manejo de casos edge y errores multiplataforma
+- **Documentación completa**: README actualizado con todas las nuevas funcionalidades
+- **Ayuda integrada**: show_help actualizado con todos los comandos disponibles
+
+### Corregido
+- **Array indexing en Zsh**: corrección de acceso a arrays (1-indexed vs 0-indexed)
+- **Argumentos de comandos**: parser mejorado para comandos con parámetros
+- **Compatibilidad multiplataforma**: eliminación de dependencias específicas de macOS
+- **Permisos y rutas**: adaptación automática según sistema operativo
+
+### Autor
+**Fernando Ferrari** - fernando.ferrari@gmail.com
+
+---
+
 ## [1.2.0] - 2025-06-17
 ### Añadido
 - Cabecera profesional y autodescriptiva, con instrucciones rápidas y advertencias.
