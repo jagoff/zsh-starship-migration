@@ -166,7 +166,7 @@ validate_system() {
     esac
     
     ping -c 1 8.8.8.8 >/dev/null 2>&1 || { log_error "No hay conexión a internet."; has_error=true; }
-    [[ -f "$HOME/.zshrc" ]] || { log_error "No se encontró el archivo ~/.zshrc. Se creará uno nuevo durante la migración."; }
+    [[ -f "$HOME/.zshrc" ]] || { log_warn "No se encontró el archivo ~/.zshrc. Se creará uno nuevo durante la migración."; }
     local omz_found=false
     if [[ -d "$HOME/.oh-my-zsh" ]]; then
         omz_found=true
@@ -995,7 +995,7 @@ EOF
     # Configuración de directorio según tema
     if [[ "$STARSHIP_TRUNC_DIR" = true || "$STARSHIP_COLOR_DIR" = true ]]; then
         starship_config_content+="[directory]\n"
-        [[ "$STARSHIP_TRUNC_DIR" = true ]] && starship_config_content+="truncation_length = 3\ntruncate_to_repo = true\n"
+        [[ "$STARSHIP_TRUNC_DIR" = true ]] && starship_config_content+="truncation_length = 3\ntruncate_to_repo = true\nstyle = \"bold magenta\"\n\n"
         
         # Colores de directorio según tema
         case "$STARSHIP_THEME" in
@@ -1028,16 +1028,16 @@ EOF
     if [[ "$STARSHIP_GIT" = true ]]; then
         case "$STARSHIP_THEME" in
             "Nerd")
-                starship_config_content+="[git_branch]\nsymbol = \"  \"\nstyle = \"bold yellow\"\n\n[git_status]\nstyle = \"bold red\"\nstashed = \" \"\nahead = \"⇡\${count}\"\nbehind = \"⇣\${count}\"\ndiverged = \"⇕⇡\${ahead_count}⇣\${behind_count}\"\nconflicted = \" \"\ndeleted = \" \"\nrenamed = \" \"\nmodified = \" \"\nstaged = '[++\($count\)](green)'\nuntracked = \" \"\n\n"
+                starship_config_content+="[git_branch]\nsymbol = \"🌱 \"\nstyle = \"bold yellow\"\n\n"
                 ;;
             "Cyberpunk")
-                starship_config_content+="[git_branch]\nsymbol = \"⚡ \"\nstyle = \"bold bright-green\"\n\n[git_status]\nstyle = \"bold bright-red\"\nstashed = \"💾\"\nahead = \"⬆️\${count}\"\nbehind = \"⬇️\${count}\"\ndiverged = \"⬆️⬇️\${ahead_count}\${behind_count}\"\nconflicted = \"💥\"\ndeleted = \"🗑️\"\nrenamed = \"🏷️\"\nmodified = \"⚡\"\nstaged = '[++\($count\)](bright-green)'\nuntracked = \"❓\"\n\n"
+                starship_config_content+="[git_branch]\nsymbol = \"⚡ \"\nstyle = \"bold bright-green\"\n\n"
                 ;;
             "Gaming")
-                starship_config_content+="[git_branch]\nsymbol = \"🎮 \"\nstyle = \"bold bright-yellow\"\n\n[git_status]\nstyle = \"bold bright-red\"\nstashed = \"🎒\"\nahead = \"⬆️\${count}\"\nbehind = \"⬇️\${count}\"\ndiverged = \"⬆️⬇️\${ahead_count}\${behind_count}\"\nconflicted = \"💣\"\ndeleted = \"💀\"\nrenamed = \"🏆\"\nmodified = \"⚔️\"\nstaged = '[++\($count\)](bright-green)'\nuntracked = \"🎯\"\n\n"
+                starship_config_content+="[git_branch]\nsymbol = \"🎮 \"\nstyle = \"bold bright-yellow\"\n\n"
                 ;;
             *)
-                starship_config_content+="[git_branch]\nsymbol = \"🌱 \"\nstyle = \"bold yellow\"\n\n[git_status]\nstyle = \"bold red\"\nstashed = \"📦\"\nahead = \"⇡\${count}\"\nbehind = \"⇣\${count}\"\ndiverged = \"⇕⇡\${ahead_count}⇣\${behind_count}\"\nconflicted = \"🔥\"\ndeleted = \"🗑️ \"\nrenamed = \"🏷️ \"\nmodified = \"📝 \"\nstaged = '[++\($count\)](green)'\nuntracked = \"🤷 \"\n\n"
+                starship_config_content+="[git_branch]\nsymbol = \"🌱 \"\nstyle = \"bold yellow\"\n\n"
                 ;;
         esac
     fi
@@ -1046,7 +1046,7 @@ EOF
     if [[ "$STARSHIP_NODEJS" = true ]]; then
         case "$STARSHIP_THEME" in
             "Nerd")
-                starship_config_content+="[nodejs]\nsymbol = \" \"\n\n"
+                starship_config_content+="[nodejs]\nsymbol = \"🤖 \"\n\n"
                 ;;
             "Cyberpunk")
                 starship_config_content+="[nodejs]\nsymbol = \"⚡ \"\nstyle = \"bold bright-green\"\n\n"
@@ -1059,27 +1059,15 @@ EOF
     
     # Configuración de Python
     if [[ "$STARSHIP_PYTHON" = true || "$STARSHIP_PYENV" = true ]]; then
-        starship_config_content+="[python]\n"
-        case "$STARSHIP_THEME" in
-            "Nerd")
-                starship_config_content+="symbol = \" \"\n"
-                ;;
-            "Cyberpunk")
-                starship_config_content+="symbol = \"⚡ \"\nstyle = \"bold bright-yellow\"\n"
-                ;;
-            *)
-                starship_config_content+="symbol = \"🐍 \"\n"
-                ;;
-        esac
-        [[ "$STARSHIP_PYENV" = true ]] && starship_config_content+="disabled = false\npyenv_version_name = true\n"
-        starship_config_content+="\n"
+        starship_config_content+="[python]\nsymbol = \"🐍 \"\ndisabled = false\npyenv_version_name = true\n\n"
+        ;;
     fi
     
     # Configuración de Docker
     if [[ "$STARSHIP_DOCKER" = true ]]; then
         case "$STARSHIP_THEME" in
             "Nerd")
-                starship_config_content+="[docker_context]\nsymbol = \" \"\n\n"
+                starship_config_content+="[docker_context]\nsymbol = \"🐳 \"\n\n"
                 ;;
             *)
                 starship_config_content+="[docker_context]\nsymbol = \"🐳 \"\n\n"
@@ -1100,11 +1088,6 @@ EOF
     # Configuración de Terraform
     if [[ "$STARSHIP_TERRAFORM" = true ]]; then
         starship_config_content+="[terraform]\nsymbol = \"💠 \"\nstyle = \"bold purple\"\n\n"
-    fi
-    
-    # Configuración de Vault
-    if [[ "$STARSHIP_VAULT" = true ]]; then
-        starship_config_content+="[vault]\nsymbol = \"🔐 \"\nstyle = \"bold red\"\n\n"
     fi
     
     # Configuración de otros lenguajes
@@ -1134,45 +1117,13 @@ EOF
     
     # Configuración de character según tema
     if [[ "$STARSHIP_CUSTOM_SYMBOLS" = true || "$STARSHIP_LANG_SYMBOLS" = true ]]; then
-        starship_config_content+="[character]\n"
-        case "$STARSHIP_THEME" in
-            "Nerd")
-                starship_config_content+="success_symbol = \"[ ](bold green)\"\nerror_symbol = \"[ ](bold red)\"\nvicmd_symbol = \"[ ](bold green)\"\n\n"
-                ;;
-            "Cyberpunk")
-                starship_config_content+="success_symbol = \"[⚡](bold bright-green)\"\nerror_symbol = \"[💥](bold bright-red)\"\nvicmd_symbol = \"[⚡](bold bright-green)\"\n\n"
-                ;;
-            "Gaming")
-                starship_config_content+="success_symbol = \"[🎮](bold bright-green)\"\nerror_symbol = \"[💀](bold bright-red)\"\nvicmd_symbol = \"[🎮](bold bright-green)\"\n\n"
-                ;;
-            "Custom")
-                starship_config_content+="success_symbol = \"[➜](bold $STARSHIP_CUSTOM_SUCCESS_COLOR)\"\nerror_symbol = \"[✗](bold $STARSHIP_CUSTOM_ERROR_COLOR)\"\nvicmd_symbol = \"[V](bold $STARSHIP_CUSTOM_SUCCESS_COLOR)\"\n\n"
-                ;;
-            *)
-                starship_config_content+="success_symbol = \"[➜](bold green)\"\nerror_symbol = \"[✗](bold red)\"\nvicmd_symbol = \"[V](bold green)\"\n\n"
-                ;;
-        esac
-        
-        # Símbolos de lenguajes adicionales
-        case "$STARSHIP_THEME" in
-            "Nerd")
-                starship_config_content+="[golang]\nsymbol = \" \"\n[rust]\nsymbol = \" \"\n[conda]\nsymbol = \" \"\n\n"
-                ;;
-            "Cyberpunk")
-                starship_config_content+="[golang]\nsymbol = \"⚡ \"\n[rust]\nsymbol = \"⚡ \"\n[conda]\nsymbol = \"⚡ \"\n\n"
-                ;;
-            "Gaming")
-                starship_config_content+="[golang]\nsymbol = \"🎮 \"\n[rust]\nsymbol = \"🎮 \"\n[conda]\nsymbol = \"🎮 \"\n\n"
-                ;;
-            *)
-                starship_config_content+="[golang]\nsymbol = \"🐹 \"\n[rust]\nsymbol = \"🦀 \"\n[conda]\nsymbol = \"🗂️  \"\n\n"
-                ;;
-        esac
+        starship_config_content+="[character]\nsuccess_symbol = \"[➜](bold green)\"\nerror_symbol = \"[✗](bold red)\"\nvicmd_symbol = \"[V](bold green)\"\n\n"
+        ;;
     fi
     
     # Configuración de duración de comandos
     if [[ "$STARSHIP_CMD_DURATION" = true ]]; then
-        starship_config_content+="[cmd_duration]\nmin_time = 500\nformat = \"took [$duration]($style) \"\nstyle = \"yellow bold\"\n\n"
+        starship_config_content+="[cmd_duration]\nmin_time = 500\nformat = \"took [\$duration](\$style) \"\nstyle = \"yellow bold\"\n\n"
     fi
     
     # Configuración de usuario
@@ -1197,17 +1148,17 @@ EOF
     
     # Configuración de tiempo
     if [[ "$STARSHIP_TIME" = true ]]; then
-        starship_config_content+="[time]\ndisabled = false\nformat = \"[$time]($style) \"\nstyle = \"bold yellow\"\n\n"
+        starship_config_content+="[time]\ndisabled = false\nformat = \"[\$time](\$style) \"\nstyle = \"bold yellow\"\n\n"
     fi
     
     # Configuración de paquetes
     if [[ "$STARSHIP_PKG_VERSION" = true ]]; then
-        starship_config_content+="[package]\ndisabled = false\nformat = \"[$version](208 bold) \"\n\n"
+        starship_config_content+="[package]\ndisabled = false\nformat = \"[\$version](208 bold) \"\n\n"
     fi
     
     # Configuración de shell
     if [[ "$STARSHIP_SHELL" = true ]]; then
-        starship_config_content+="[shell]\ndisabled = false\nformat = \"[$indicator]($style) \"\nstyle = \"bold green\"\n\n"
+        starship_config_content+="[shell]\ndisabled = false\nformat = \"[\$indicator](\$style) \"\nstyle = \"bold green\"\n\n"
     fi
 
     if [[ "$DRY_RUN" = true ]]; then
@@ -2797,7 +2748,7 @@ main() {
                 show_help
                 exit 1
             fi
-            save_configuration_profile "${command_args[1]}"
+            save_configuration_profile "${command_args[0]}"
             add_gamification_xp 5
             unlock_achievement "Perfil guardado"
             ;;
@@ -2807,7 +2758,7 @@ main() {
                 show_help
                 exit 1
             fi
-            load_configuration_profile "${command_args[1]}"
+            load_configuration_profile "${command_args[0]}"
             add_gamification_xp 5
             unlock_achievement "Perfil cargado"
             ;;
@@ -2821,7 +2772,7 @@ main() {
                 show_help
                 exit 1
             fi
-            export_configuration "${command_args[1]}" "${command_args[2]:-}"
+            export_configuration "${command_args[0]}" "${command_args[1]:-}"
             add_gamification_xp 5
             unlock_achievement "Perfil exportado"
             ;;
@@ -2831,7 +2782,7 @@ main() {
                 show_help
                 exit 1
             fi
-            import_configuration "${command_args[1]}" "${command_args[2]:-}"
+            import_configuration "${command_args[0]}" "${command_args[1]:-}"
             add_gamification_xp 5
             unlock_achievement "Perfil importado"
             ;;
@@ -2841,7 +2792,7 @@ main() {
                 show_help
                 exit 1
             fi
-            sync_configuration_with_git "${command_args[1]}"
+            sync_configuration_with_git "${command_args[0]}"
             add_gamification_xp 10
             unlock_achievement "Sync Git"
             ;;
