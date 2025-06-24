@@ -1060,7 +1060,6 @@ EOF
     # Configuración de Python
     if [[ "$STARSHIP_PYTHON" = true || "$STARSHIP_PYENV" = true ]]; then
         starship_config_content+="[python]\nsymbol = \"🐍 \"\ndisabled = false\npyenv_version_name = true\n\n"
-        ;;
     fi
     
     # Configuración de Docker
@@ -1118,7 +1117,6 @@ EOF
     # Configuración de character según tema
     if [[ "$STARSHIP_CUSTOM_SYMBOLS" = true || "$STARSHIP_LANG_SYMBOLS" = true ]]; then
         starship_config_content+="[character]\nsuccess_symbol = \"[➜](bold green)\"\nerror_symbol = \"[✗](bold red)\"\nvicmd_symbol = \"[V](bold green)\"\n\n"
-        ;;
     fi
     
     # Configuración de duración de comandos
