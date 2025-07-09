@@ -663,7 +663,7 @@ validate_system() {
         exit 1
     fi
     
-    log_result true "Sistema validado"
+            log_result true "System validated"
     export OMZ_FOUND="$omz_found"
 }
 
@@ -700,7 +700,7 @@ create_backup() {
         cp "$HOME/.config/starship.toml" "$backup_dir/"
     fi
     
-    log_result true "Backup creado"
+            log_result true "Backup created"
 }
 
 # Analiza el .zshrc para extraer configuraciones personales.
@@ -806,7 +806,7 @@ analyze_config() {
 
     # Exportar los contadores para el mensaje final.
     export COUNT_ALIASES COUNT_EXPORTS COUNT_FUNCTIONS
-    log_result true "Configuración analizada ($COUNT_ALIASES alias, $COUNT_EXPORTS exports, $COUNT_FUNCTIONS funciones)"
+            log_result true "Configuration analyzed ($COUNT_ALIASES aliases, $COUNT_EXPORTS exports, $COUNT_FUNCTIONS functions)"
 }
 
 # Selección de plugins de Zsh
@@ -1235,9 +1235,9 @@ install_dependencies() {
     fi
     
     # Mostrar resultados
-    log_result "$starship_installed" "Instalación Starship"
-    log_result "$plugins_installed" "Instalación plugins"
-    log_result "$tools_installed" "Instalación herramientas"
+    log_result "$starship_installed" "Starship installation"
+    log_result "$plugins_installed" "Plugins installation"
+    log_result "$tools_installed" "Tools installation"
     
     set -e  # Restaurar 'set -e' al final de la función
 }
@@ -1703,8 +1703,8 @@ EOF
     mkdir -p "$HOME/.config"
     echo -e "$starship_config_content" > "$starship_config_path"
     
-    log_result "$zshrc_ok" "Generación .zshrc"
-    log_result "$starship_ok" "Generación Starship"
+    log_result "$zshrc_ok" ".zshrc generation"
+    log_result "$starship_ok" "Starship generation"
 }
 
 # Restaura la configuración desde el último backup.
@@ -1743,7 +1743,7 @@ rollback_migration() {
         rm -f "$HOME/.config/starship.toml"
     fi
     
-    log_result true "Rollback completado"
+    log_result true "Rollback completed"
                 log_info "Reinicia tu terminal o ejecuta 'source ~/.zshrc'"
 }
 
@@ -2086,16 +2086,28 @@ main() {
             # Paso 2: Selección de features/configuraciones de Starship
             select_starship_features
             
+            # === SYSTEM VALIDATION ===
+            echo -e "\n${C_BLUE}📋 SYSTEM VALIDATION${C_NC}"
             validate_system || MIGRATION_OK=false
-            detect_common_issues || log_verbose "Problemas detectados, se solucionarán automáticamente"
-            create_backup && BACKUP_OK=true || log_error "Error en backup"
-            analyze_config && ANALYZE_OK=true || log_error "Error en análisis"
-            install_dependencies && INSTALL_OK=true || log_error "Error en instalación"
-            generate_new_config && CONFIG_OK=true || log_error "Error en configuración"
-            fix_common_issues || log_verbose "Algunos problemas comunes no se pudieron solucionar"
+            detect_common_issues || log_verbose "Issues detected, will be fixed automatically"
             
-            # Validate and fix prompt
-            log_info "🔍 Validating Starship prompt..."
+            # === BACKUP & ANALYSIS ===
+            echo -e "\n${C_BLUE}💾 BACKUP & ANALYSIS${C_NC}"
+            create_backup && BACKUP_OK=true || log_error "Backup error"
+            analyze_config && ANALYZE_OK=true || log_error "Analysis error"
+            
+            # === INSTALLATION ===
+            echo -e "\n${C_BLUE}⚙️  INSTALLATION${C_NC}"
+            install_dependencies && INSTALL_OK=true || log_error "Installation error"
+            
+            # === CONFIGURATION ===
+            echo -e "\n${C_BLUE}🔧 CONFIGURATION${C_NC}"
+            generate_new_config && CONFIG_OK=true || log_error "Configuration error"
+            fix_common_issues || log_verbose "Some common issues could not be fixed"
+            
+            # === VALIDATION ===
+            echo -e "\n${C_BLUE}🔍 VALIDATION${C_NC}"
+            log_info "Validating Starship prompt..."
             if ! validate_starship_config; then
                 log_warn "Prompt issues detected - fixing automatically"
                 fix_starship_format
@@ -2111,19 +2123,21 @@ main() {
             
             post_migration_validation && VALIDATION_OK=true || VALIDATION_OK=false
             
+            # === FINISH ===
+            echo -e "\n${C_BLUE}🎯 FINISH${C_NC}"
             # Logging completo del sistema
             comprehensive_logging
             
             # Resumen final simplificado
             if [[ "$BACKUP_OK" = true && "$ANALYZE_OK" = true && "$INSTALL_OK" = true && "$CONFIG_OK" = true && "$VALIDATION_OK" = true ]]; then
-                echo -e "\n${C_GREEN}🎉 ¡Migración completada con éxito!${C_NC}"
-                echo -e "   - Backup creado en: ${C_YELLOW}${MIGRATION_BACKUP_PATH}${C_NC}"
-                echo -e "   - Para revertir, ejecuta: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
-                echo -e "   - ${C_BLUE}Por favor, reinicia tu terminal o ejecuta 'source ~/.zshrc' para ver los cambios.${C_NC}"
+                echo -e "\n${C_GREEN}🎉 Migration completed successfully!${C_NC}"
+                echo -e "   - Backup created at: ${C_YELLOW}${MIGRATION_BACKUP_PATH}${C_NC}"
+                echo -e "   - To revert, run: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
+                echo -e "   - ${C_BLUE}Please restart your terminal or run 'source ~/.zshrc' to see changes.${C_NC}"
             else
-                echo -e "\n${C_RED}❌ Migración incompleta${C_NC}"
-                echo -e "   - Revisa los errores anteriores"
-                echo -e "   - Para revertir, ejecuta: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
+                echo -e "\n${C_RED}❌ Migration incomplete${C_NC}"
+                echo -e "   - Check previous errors"
+                echo -e "   - To revert, run: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
             fi
             ;;
     esac
