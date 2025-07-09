@@ -489,7 +489,7 @@ validate_starship_config() {
 
 # Función para corregir automáticamente el formato de Starship
 fix_starship_format() {
-    log_info "🔧 Corrigiendo formato de Starship..."
+    log_info "🔧 Fixing Starship format..."
     
     # Crear formato básico si no existe
     local starship_config="$HOME/.config/starship.toml"
@@ -570,29 +570,29 @@ EOF
     
     # Corregir formato vacío
     if grep -q '^format = ""' "$starship_config"; then
-        log_info "Corrigiendo formato vacío..."
+        log_info "Fixing empty format..."
         sed -i '' 's/format = ""/format = "$username$hostname$directory$git_branch$git_status$nodejs$python$docker_context$kubernetes$terraform$cmd_duration$character"/' "$starship_config"
-        log_success "Formato corregido"
+        log_success "Format fixed"
     fi
     
     # Corregir right_format vacío o duplicado
     if grep -q '^right_format = ""' "$starship_config" || grep -q 'right_format = ".*\$username.*"' "$starship_config"; then
-        log_info "Corrigiendo right_format..."
+        log_info "Fixing right format..."
         sed -i '' 's/right_format = ".*"/right_format = "$cmd_duration$time$battery"/' "$starship_config"
-        log_success "Right format corregido"
+        log_success "Right format fixed"
     fi
     
     # Corregir configuración de battery si tiene claves inválidas
     if grep -q "charging_style\|discharging_style\|unknown_style" "$starship_config"; then
-        log_info "Corrigiendo configuración de battery..."
+        log_info "Fixing battery config..."
         sed -i '' '/charging_style = /d' "$starship_config"
         sed -i '' '/discharging_style = /d' "$starship_config"
         sed -i '' '/unknown_style = /d' "$starship_config"
-        log_success "Configuración de battery corregida"
+        log_success "Battery config fixed"
     fi
     # Eliminar cualquier línea 'style = ...' dentro de [battery]
     if grep -q '^\[battery\]' "$starship_config"; then
-        log_info "Eliminando 'style = ...' dentro de [battery] para evitar warnings"
+        log_info "Removing battery style warnings..."
         # Buscar el bloque [battery] y eliminar líneas style = ... dentro de ese bloque
         awk '
         BEGIN {in_battery=0}
@@ -601,15 +601,15 @@ EOF
         in_battery && /^style[ ]*=/ {next}
         {print}
         ' "$starship_config" > "$starship_config.tmp" && mv "$starship_config.tmp" "$starship_config"
-        log_success "Líneas 'style = ...' eliminadas del bloque [battery]"
+        log_success "Battery style warnings removed"
     fi
     
     # Verificar que el prompt funcione
     if starship prompt --status 0 >/dev/null 2>&1; then
-        log_success "Prompt de Starship funcionando correctamente"
+        log_success "Starship prompt working correctly"
         return 0
     else
-        log_error "Prompt de Starship aún no funciona"
+        log_error "Starship prompt still not working"
         return 1
     fi
 }
@@ -629,9 +629,9 @@ comprehensive_logging() {
     # Resumen final
     local total_errors=$((system_errors + starship_errors))
     if [[ $total_errors -eq 0 ]]; then
-        log_result true "Verificación de errores"
+        log_result true "Error check"
     else
-        log_result false "Verificación de errores ($total_errors problema(s))"
+        log_result false "Error check ($total_errors issues)"
     fi
 }
 
@@ -1877,74 +1877,71 @@ generate_report() {
 
 # Validación y testeo post-migración
 post_migration_validation() {
-    echo -e "\n${C_BLUE}Validación post-migración:${C_NC}"
-    
     local total_checks=0
     local passed_checks=0
     
-    # Test alias principales
+    # Test aliases (grouped)
+    local alias_ok=0
     for a in ls la ll l; do
-        ((total_checks++))
         if zsh -i -c "$a --icons" &>/dev/null; then
-            echo -e "  ${C_GREEN}✅ Alias $a OK${C_NC}"
-            ((passed_checks++))
-        else
-            echo -e "  ${C_RED}❌ Alias $a FAIL${C_NC}"
+            ((alias_ok++))
         fi
     done
+    ((total_checks++))
+    if [[ $alias_ok -eq 4 ]]; then
+        echo -e "  ${C_GREEN}✅ Aliases OK${C_NC}"
+        ((passed_checks++))
+    else
+        echo -e "  ${C_RED}❌ Aliases FAIL${C_NC}"
+    fi
     
-    # Test Starship prompt
+    # Test Starship
     ((total_checks++))
     if zsh -i -c 'starship --version' &>/dev/null && grep -q 'starship init zsh' "$HOME/.zshrc"; then
-        echo -e "  ${C_GREEN}✅ Starship activo${C_NC}"
+        echo -e "  ${C_GREEN}✅ Starship OK${C_NC}"
         ((passed_checks++))
     else
-        echo -e "  ${C_RED}❌ Starship inactivo${C_NC}"
+        echo -e "  ${C_RED}❌ Starship FAIL${C_NC}"
     fi
     
-    # Test plugins seleccionados
+    # Test plugins (grouped)
+    local plugins_ok=0
     for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-completions zsh-history-substring-search zsh-you-should-use; do
-        ((total_checks++))
         if [[ -d "$ZSH_PLUGINS_DIR/$plugin" ]] && grep -q "$plugin" "$HOME/.zshrc"; then
-            echo -e "  ${C_GREEN}✅ $plugin cargado${C_NC}"
-            ((passed_checks++))
-        else
-            echo -e "  ${C_RED}❌ $plugin no cargado${C_NC}"
+            ((plugins_ok++))
         fi
     done
-    
-    # Test herramientas modernas
-    for tool in eza bat fd fzf; do
-        ((total_checks++))
-        if command -v "$tool" &>/dev/null; then
-            echo -e "  ${C_GREEN}✅ $tool OK${C_NC}"
-            ((passed_checks++))
-        else
-            echo -e "  ${C_RED}❌ $tool NO INSTALADO${C_NC}"
-        fi
-    done
-    
-    # Test ripgrep (comando rg)
     ((total_checks++))
-    if command -v rg &>/dev/null; then
-        echo -e "  ${C_GREEN}✅ ripgrep (rg) OK${C_NC}"
+    if [[ $plugins_ok -eq 5 ]]; then
+        echo -e "  ${C_GREEN}✅ Plugins OK${C_NC}"
         ((passed_checks++))
     else
-        echo -e "  ${C_RED}❌ ripgrep (rg) NO INSTALADO${C_NC}"
+        echo -e "  ${C_RED}❌ Plugins FAIL${C_NC}"
     fi
     
-    # Resumen de validación
-    echo -e "\n${C_BLUE}Resumen de validación:${C_NC}"
-    echo -e "  ${C_GREEN}$passed_checks OK${C_NC}  ${C_RED}$((total_checks - passed_checks)) FAIL${C_NC}"
+    # Test tools (grouped)
+    local tools_ok=0
+    for tool in eza bat fd fzf rg; do
+        if command -v "$tool" &>/dev/null; then
+            ((tools_ok++))
+        fi
+    done
+    ((total_checks++))
+    if [[ $tools_ok -eq 5 ]]; then
+        echo -e "  ${C_GREEN}✅ Tools OK${C_NC}"
+        ((passed_checks++))
+    else
+        echo -e "  ${C_RED}❌ Tools FAIL${C_NC}"
+    fi
     
-    # Determinar si la validación fue exitosa (al menos 80% de éxito)
+    # Success rate
     local success_rate=$((passed_checks * 100 / total_checks))
     
     if [[ $success_rate -ge 80 ]]; then
-        log_result true "Validación final ($success_rate%)"
+        log_result true "Final validation ($success_rate%)"
         return 0
     else
-        log_result false "Validación final ($success_rate%)"
+        log_result false "Final validation ($success_rate%)"
         return 1
     fi
 }
@@ -2097,19 +2094,19 @@ main() {
             generate_new_config && CONFIG_OK=true || log_error "Error en configuración"
             fix_common_issues || log_verbose "Algunos problemas comunes no se pudieron solucionar"
             
-            # Validación y corrección automática del prompt
-            log_info "🔍 Validando prompt de Starship..."
+            # Validate and fix prompt
+            log_info "🔍 Validating Starship prompt..."
             if ! validate_starship_config; then
-                log_warn "Problemas detectados en el prompt - corrigiendo automáticamente"
+                log_warn "Prompt issues detected - fixing automatically"
                 fix_starship_format
-                # Revalidar después de la corrección
+                # Revalidate after fix
                 if validate_starship_config; then
-                    log_success "Prompt corregido y funcionando"
+                    log_success "Prompt fixed and working"
                 else
-                    log_error "No se pudo corregir el prompt automáticamente"
+                    log_error "Could not fix prompt automatically"
                 fi
             else
-                log_success "Prompt de Starship funcionando correctamente"
+                log_success "Starship prompt working correctly"
             fi
             
             post_migration_validation && VALIDATION_OK=true || VALIDATION_OK=false
