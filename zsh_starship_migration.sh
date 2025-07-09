@@ -465,25 +465,25 @@ validate_starship_config() {
     
     # Verificar que el formato no esté vacío
     if grep -q '^format = ""' "$HOME/.config/starship.toml"; then
-        log_error "Formato de Starship está vacío - corrigiendo automáticamente"
+        log_error "Starship format is empty - fixing automatically"
         fix_starship_format
         return 1
     fi
     
     # Verificar que el formato tenga contenido válido
     if ! grep -q '^format = ".*\$.*"' "$HOME/.config/starship.toml"; then
-        log_error "Formato de Starship no tiene variables válidas - corrigiendo automáticamente"
+        log_error "Starship format has no valid variables - fixing automatically"
         fix_starship_format
         return 1
     fi
     
     # Verificar que no haya errores de configuración
     if ! log_starship_errors; then
-        log_error "Configuración de Starship tiene errores"
+        log_error "Starship configuration has errors"
         return 1
     fi
     
-    log_verbose "Configuración de Starship válida"
+            log_verbose "Starship configuration is valid"
     return 0
 }
 
@@ -678,7 +678,7 @@ create_backup() {
     export MIGRATION_BACKUP_PATH="$backup_dir"
 
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se crearía un backup en: $backup_dir"
+        log_warn "[DRY-RUN] Would create backup at: $backup_dir"
         return
     fi
     
@@ -813,7 +813,7 @@ analyze_config() {
 select_zsh_plugins() {
     if [[ "$AUTO_MODE" = true ]]; then
         # Modo automático: instalar todos los plugins por defecto
-        log_info "Modo automático: instalando todos los plugins por defecto"
+        log_info "Auto mode: installing all plugins by default"
         INSTALL_AUTOSUGGESTIONS=true
         INSTALL_SYNTAX_HIGHLIGHTING=true
         INSTALL_COMPLETIONS=true
@@ -824,7 +824,7 @@ select_zsh_plugins() {
         # Modo interactivo: usar GUI moderna
         check_gui_dependencies
         
-        log_info "Configuración de plugins de Zsh:"
+        log_info "Zsh plugins configuration:"
         
         local selected_plugins=$(show_gui_multi_select \
             "Plugins de Zsh" \
@@ -913,7 +913,7 @@ handle_dependencies() {
 select_starship_features() {
     if [[ "$AUTO_MODE" = true ]]; then
         # Modo automático: seleccionar todas las opciones sin interacción
-        log_info "Modo automático: aplicando configuración completa por defecto"
+        log_info "Auto mode: applying complete configuration by default"
         STARSHIP_THEME="Pastel Powerline"
         STARSHIP_BLANK_LINE=true
         STARSHIP_GIT=true
@@ -949,7 +949,7 @@ select_starship_features() {
         # Modo interactivo: usar GUI moderna
         check_gui_dependencies
         
-        log_info "Configuración de personalizaciones de Starship:"
+        log_info "Starship customization configuration:"
         
         # Selección de módulos básicos
         local basic_modules=$(show_gui_multi_select \
@@ -1158,7 +1158,7 @@ install_dependencies() {
     local starship_installed=true
     if ! command -v starship >/dev/null; then
         if [[ "$DRY_RUN" = true ]]; then
-            log_warn "[DRY-RUN] Se ejecutaría: brew install starship"
+            log_warn "[DRY-RUN] Would run: brew install starship"
         else
             brew install starship >/dev/null && starship_installed=true || starship_installed=false
         fi
@@ -1167,7 +1167,7 @@ install_dependencies() {
     # 2. Plugins de Zsh
     local plugins_installed=true
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se clonarían los repositorios de plugins en $ZSH_PLUGINS_DIR"
+        log_warn "[DRY-RUN] Would clone plugin repositories in $ZSH_PLUGINS_DIR"
     else
         # Verificar que el directorio de plugins existe y es escribible
         if [[ ! -d "$ZSH_PLUGINS_DIR" ]]; then
@@ -1175,7 +1175,7 @@ install_dependencies() {
         fi
         
         if [[ ! -w "$ZSH_PLUGINS_DIR" ]]; then
-            log_error "El directorio $ZSH_PLUGINS_DIR no es escribible"
+            log_error "Directory $ZSH_PLUGINS_DIR is not writable"
             plugins_installed=false
         else
             # Instalar plugins
@@ -1222,7 +1222,7 @@ install_dependencies() {
         
         if [[ ${#tools_to_install[@]} -gt 0 ]]; then
             if [[ "$DRY_RUN" = true ]]; then
-                log_warn "[DRY-RUN] Se ejecutaría: brew install ${tools_to_install[*]}"
+                log_warn "[DRY-RUN] Would run: brew install ${tools_to_install[*]}"
             else
                 brew install ${tools_to_install[@]} >/dev/null || tools_installed=false
             fi
@@ -1681,8 +1681,8 @@ EOF
     fi
 
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se crearía ~/.zshrc.new y se validaría."
-        log_warn "[DRY-RUN] Se crearía ~/.config/starship.toml."
+        log_warn "[DRY-RUN] Would create ~/.zshrc.new and validate it."
+        log_warn "[DRY-RUN] Would create ~/.config/starship.toml."
         return
     fi
     
@@ -1694,7 +1694,7 @@ EOF
     if zsh -n "$HOME/.zshrc.new"; then
         mv "$HOME/.zshrc.new" "$HOME/.zshrc"
     else
-        log_error "El .zshrc generado tiene un error de sintaxis. Abortando para prevenir problemas."
+        log_error "Generated .zshrc has syntax error. Aborting to prevent issues."
         rm "$HOME/.zshrc.new"
         exit 1
     fi
@@ -1714,12 +1714,12 @@ rollback_migration() {
     latest_backup=$(find "$BACKUP_BASE_DIR" -maxdepth 1 -type d -name "20*" | sort -r | head -n 1)
 
     if [[ -z "$latest_backup" ]]; then
-        log_error "No se encontraron backups en $BACKUP_BASE_DIR. No se puede hacer rollback."
+        log_error "No backups found in $BACKUP_BASE_DIR. Cannot perform rollback."
         exit 1
     fi
 
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Se restaurarían los archivos desde $latest_backup."
+        log_warn "[DRY-RUN] Would restore files from $latest_backup."
         return
     fi
 
@@ -1744,7 +1744,7 @@ rollback_migration() {
     fi
     
     log_result true "Rollback completed"
-                log_info "Reinicia tu terminal o ejecuta 'source ~/.zshrc'"
+                log_info "Restart your terminal or run 'source ~/.zshrc'"
 }
 
 # Muestra el estado actual de la configuración de forma simplificada
@@ -1982,26 +1982,26 @@ main() {
                 ;;
             rollback|status|report)
                 if [[ -n "$command" ]]; then
-                    log_error "Solo se puede especificar un comando a la vez."
+                    log_error "Only one command can be specified at a time."
                     exit 1
                 fi
                 command=$1
                 shift
                 ;;
-            -*) # Captura cualquier otra opción no reconocida
-                log_error "Opción no reconocida: $1"
+            -*) # Capture any other unrecognized option
+                log_error "Unrecognized option: $1"
                 show_help
                 exit 1
                 ;;
             *) # Captura argumentos que no son opciones
                 if [[ -z "$command" ]]; then
                     # Si no hay comando, esto es un error.
-                    log_error "Comando no reconocido: $1"
+                    log_error "Unrecognized command: $1"
                     show_help
                     exit 1
                 else
                     # Si ya hay un comando, es un argumento extra no esperado.
-                    log_error "Argumento inesperado: $1 para el comando '$command'"
+                    log_error "Unexpected argument: $1 for command '$command'"
                     exit 1
                 fi
                 ;;
@@ -2013,7 +2013,7 @@ main() {
         # Activar verbose en dry-run es útil para ver qué se haría.
         VERBOSE=true
         set +e  # <--- PATCH: Disable exit on error in dry-run mode
-        log_info "Modo DRY-RUN activado. No se realizarán cambios."
+        log_info "DRY-RUN mode activated. No changes will be made."
     fi
 
     # Mostrar estado antes de cualquier acción, excepto en status, help, rollback
@@ -2026,9 +2026,9 @@ main() {
 
     # Mostrar el modo de ejecución
     if [[ "$AUTO_MODE" = true ]]; then
-        log_info "🚀 Ejecutando en modo AUTOMÁTICO (no interactivo)"
+        log_info "🚀 Running in AUTO mode (non-interactive)"
     else
-        log_info "🎯 Ejecutando en modo INTERACTIVO"
+        log_info "🎯 Running in INTERACTIVE mode"
     fi
     
     # Validación automática del prompt (excepto para comandos específicos)
@@ -2041,11 +2041,11 @@ main() {
             if [[ -f "$HOME/.config/starship.toml" ]]; then
                 log_verbose "🔍 Verificando estado del prompt..."
                 if grep -q '^format = ""' "$HOME/.config/starship.toml"; then
-                    log_warn "⚠️  Prompt vacío detectado - ejecuta la migración para corregir"
+                    log_warn "⚠️  Empty prompt detected - run migration to fix"
                 elif ! starship prompt --status 0 >/dev/null 2>&1; then
-                    log_warn "⚠️  Problemas con el prompt detectados - ejecuta la migración para corregir"
+                    log_warn "⚠️  Prompt issues detected - run migration to fix"
                 else
-                    log_verbose "✅ Prompt funcionando correctamente"
+                    log_verbose "✅ Prompt working correctly"
                 fi
             fi
             ;;
@@ -2054,10 +2054,10 @@ main() {
             # Confirmación final en modo interactivo
         if [[ "$AUTO_MODE" != true ]]; then
             if show_gui_confirmation \
-                "¿Deseas continuar con la migración?\n\nSe realizarán los siguientes cambios:\n• Backup de configuración actual\n• Instalación de Starship y plugins\n• Configuración de nuevo prompt\n• Instalación de herramientas modernas"; then
-                log_info "Usuario confirmó la migración"
+                "Do you want to continue with the migration?\n\nThe following changes will be made:\n• Backup of current configuration\n• Installation of Starship and plugins\n• Configuration of new prompt\n• Installation of modern tools"; then
+                log_info "User confirmed migration"
             else
-                log_info "Migración cancelada por el usuario"
+                log_info "Migration cancelled by user"
                 exit 0
             fi
         fi
