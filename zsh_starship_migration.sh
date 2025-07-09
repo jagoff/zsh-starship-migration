@@ -157,7 +157,6 @@ require_tty() {
 # --- FUNCIONES DE GUI INTERACTIVA (ADAPTATIVAS) ---
 show_gui_menu() {
     require_tty
-    echo -e "${C_GRAY}[DEBUG] Mostrando menú GUI: $1${C_NC}"
     local title="$1"
     local subtitle="$2"
     local header="$3"
@@ -175,7 +174,6 @@ show_gui_menu() {
 
 show_gui_multi_select() {
     require_tty
-    echo -e "${C_GRAY}[DEBUG] Mostrando multi-select GUI: $1${C_NC}"
     local title="$1"
     local subtitle="$2"
     local header="$3"
@@ -195,7 +193,6 @@ show_gui_multi_select() {
 
 show_gui_confirmation() {
     require_tty
-    echo -e "${C_GRAY}[DEBUG] Mostrando confirmación GUI: $1${C_NC}"
     local message="$1"
     local affirmative="${2:-Sí, continuar}"
     local negative="${3:-No, cancelar}"
@@ -206,7 +203,6 @@ show_gui_confirmation() {
         --negative="$negative" \
         "$message"
     local result=$?
-    echo -e "${C_GRAY}[DEBUG] Resultado de confirmación: $result${C_NC}"
     return $result
 }
 
@@ -459,7 +455,7 @@ log_system_errors() {
 
 # Función para validar configuración de Starship
 validate_starship_config() {
-    log_verbose "Validando configuración de Starship..."
+    # Validando configuración de Starship...
     
     # Verificar que el archivo de configuración existe
     if [[ ! -f "$HOME/.config/starship.toml" ]]; then
@@ -849,25 +845,27 @@ select_zsh_plugins() {
         INSTALL_YOU_SHOULD_USE=false
         
         # Activar plugins seleccionados
-        while IFS= read -r plugin; do
-            case "$plugin" in
-                "zsh-autosuggestions [Sugerencias automáticas de comandos]")
-                    INSTALL_AUTOSUGGESTIONS=true
-                    ;;
-                "zsh-syntax-highlighting [Resaltado de sintaxis en tiempo real]")
-                    INSTALL_SYNTAX_HIGHLIGHTING=true
-                    ;;
-                "zsh-completions [Completado avanzado y mejorado]")
-                    INSTALL_COMPLETIONS=true
-                    ;;
-                "zsh-history-substring-search [Búsqueda inteligente en historial]")
-                    INSTALL_HISTORY_SUBSTRING=true
-                    ;;
-                "zsh-you-should-use [Sugerencias de alias y comandos]")
-                    INSTALL_YOU_SHOULD_USE=true
-                    ;;
-            esac
-        done <<< "$selected_plugins"
+        if [[ -n "$selected_plugins" && "$selected_plugins" != "nothing selected" ]]; then
+            while IFS= read -r plugin; do
+                case "$plugin" in
+                    "zsh-autosuggestions [Sugerencias automáticas de comandos]")
+                        INSTALL_AUTOSUGGESTIONS=true
+                        ;;
+                    "zsh-syntax-highlighting [Resaltado de sintaxis en tiempo real]")
+                        INSTALL_SYNTAX_HIGHLIGHTING=true
+                        ;;
+                    "zsh-completions [Completado avanzado y mejorado]")
+                        INSTALL_COMPLETIONS=true
+                        ;;
+                    "zsh-history-substring-search [Búsqueda inteligente en historial]")
+                        INSTALL_HISTORY_SUBSTRING=true
+                        ;;
+                    "zsh-you-should-use [Sugerencias de alias y comandos]")
+                        INSTALL_YOU_SHOULD_USE=true
+                        ;;
+                esac
+            done <<< "$selected_plugins"
+        fi
         
         export INSTALL_AUTOSUGGESTIONS INSTALL_SYNTAX_HIGHLIGHTING INSTALL_COMPLETIONS INSTALL_HISTORY_SUBSTRING INSTALL_YOU_SHOULD_USE
     fi
@@ -875,25 +873,12 @@ select_zsh_plugins() {
 
 # Maneja las dependencias entre módulos de Starship
 handle_dependencies() {
-    log_verbose "Verificando dependencias entre módulos..."
-    
     # Si right_format está desactivado, desactivar también los módulos que solo aparecen en el right prompt
     if [[ "$STARSHIP_RIGHT_FORMAT" = false ]]; then
-        log_verbose "Right format desactivado - verificando módulos del right prompt..."
         # Estos módulos solo aparecen en el right prompt, así que los desactivamos si right_format está off
-        if [[ "$STARSHIP_CMD_DURATION" = true ]]; then
-            log_verbose "Desactivando cmd_duration (depende de right_format)"
-            STARSHIP_CMD_DURATION=false
-        fi
-        if [[ "$STARSHIP_TIME" = true ]]; then
-            log_verbose "Desactivando time (depende de right_format)"
-            STARSHIP_TIME=false
-        fi
-        if [[ "$STARSHIP_BATTERY" = true ]]; then
-            log_verbose "Desactivando battery (depende de right_format)"
-            STARSHIP_BATTERY=false
-        fi
-        # Los módulos custom pueden aparecer en ambos prompts, así que los mantenemos
+        STARSHIP_CMD_DURATION=false
+        STARSHIP_TIME=false
+        STARSHIP_BATTERY=false
     fi
     
     # Si cmd_duration, time, battery están desactivados, verificar si right_format debería estar desactivado
@@ -904,36 +889,24 @@ handle_dependencies() {
         [[ "$STARSHIP_BATTERY" = true ]] && ((right_modules_count++))
         
         if [[ $right_modules_count -eq 0 ]]; then
-            log_verbose "No hay módulos para el right prompt - desactivando right_format"
             STARSHIP_RIGHT_FORMAT=false
         fi
     fi
     
     # Dependencias de Kubernetes
     if [[ "$STARSHIP_KUBERNETES" = false ]]; then
-        if [[ "$STARSHIP_KUBERNETES_CONTEXT" = true ]]; then
-            log_verbose "Desactivando kubernetes_context (depende de kubernetes)"
-            STARSHIP_KUBERNETES_CONTEXT=false
-        fi
+        STARSHIP_KUBERNETES_CONTEXT=false
     fi
     
     # Dependencias de Docker
     if [[ "$STARSHIP_DOCKER" = false ]]; then
-        if [[ "$STARSHIP_DOCKER_DETAILED" = true ]]; then
-            log_verbose "Desactivando docker_detailed (depende de docker)"
-            STARSHIP_DOCKER_DETAILED=false
-        fi
+        STARSHIP_DOCKER_DETAILED=false
     fi
     
     # Dependencias de batería
     if [[ "$STARSHIP_BATTERY" = false ]]; then
-        if [[ "$STARSHIP_BATTERY_SMART" = true ]]; then
-            log_verbose "Desactivando battery_smart (depende de battery)"
-            STARSHIP_BATTERY_SMART=false
-        fi
+        STARSHIP_BATTERY_SMART=false
     fi
-    
-    log_verbose "Dependencias verificadas"
 }
 
 # Selección interactiva de customizaciones de Starship usando GUI moderna
@@ -1060,7 +1033,8 @@ select_starship_features() {
         ZSH_PRODUCTIVITY_FUNCTIONS=false
         
         # Procesar selecciones de módulos básicos
-        while IFS= read -r module; do
+        if [[ -n "$basic_modules" && "$basic_modules" != "nothing selected" ]]; then
+            while IFS= read -r module; do
             case "$module" in
                 "Tema personalizado (Pastel Powerline) [Diseño visual]")
                     STARSHIP_THEME="Pastel Powerline"
@@ -1085,9 +1059,11 @@ select_starship_features() {
                     ;;
             esac
         done <<< "$basic_modules"
+        fi
         
         # Procesar selecciones de características avanzadas
-        while IFS= read -r feature; do
+        if [[ -n "$advanced_features" && "$advanced_features" != "nothing selected" ]]; then
+            while IFS= read -r feature; do
             case "$feature" in
                 "Prompt multilínea [Prompt en múltiples líneas]")
                     STARSHIP_MULTILINE=true
@@ -1118,9 +1094,11 @@ select_starship_features() {
                     ;;
             esac
         done <<< "$advanced_features"
+        fi
         
         # Procesar selecciones de módulos DevOps
-        while IFS= read -r devops; do
+        if [[ -n "$devops_modules" && "$devops_modules" != "nothing selected" ]]; then
+            while IFS= read -r devops; do
             case "$devops" in
                 "Módulo AWS [Información de AWS]")
                     STARSHIP_AWS=true
@@ -1136,9 +1114,11 @@ select_starship_features() {
                     ;;
             esac
         done <<< "$devops_modules"
+        fi
         
         # Procesar selecciones de características de Zsh
-        while IFS= read -r zsh; do
+        if [[ -n "$zsh_features" && "$zsh_features" != "nothing selected" ]]; then
+            while IFS= read -r zsh; do
             case "$zsh" in
                 "Historial mejorado [Configuración avanzada del historial]")
                     ZSH_HISTORY_ENHANCED=true
@@ -1154,6 +1134,7 @@ select_starship_features() {
                     ;;
             esac
         done <<< "$zsh_features"
+        fi
         
         # Configuraciones adicionales basadas en selecciones
         if [[ "$STARSHIP_CMD_DURATION" = true || "$STARSHIP_TIME" = true || "$STARSHIP_BATTERY" = true ]]; then
@@ -1164,13 +1145,6 @@ select_starship_features() {
         
         # Manejar dependencias
         handle_dependencies
-        
-        # Mostrar resumen
-        log_verbose "Resumen de configuración final:"
-        log_verbose "Right format: $STARSHIP_RIGHT_FORMAT"
-        log_verbose "Cmd duration: $STARSHIP_CMD_DURATION"
-        log_verbose "Time: $STARSHIP_TIME"
-        log_verbose "Battery: $STARSHIP_BATTERY"
     fi
 }
 
@@ -1237,7 +1211,7 @@ install_dependencies() {
     # 3. Modern CLI tools (condicional)
     local tools_installed=true
     if [[ "$SKIP_TOOLS" = true ]]; then
-        log_verbose "Se omite la instalación de herramientas modernas (--skip-tools)."
+        # Se omite la instalación de herramientas modernas
     else
         local tools_to_install=()
         [[ "$INSTALL_EZA" = true ]] && ! command -v eza >/dev/null && tools_to_install+=("eza")
@@ -1709,9 +1683,6 @@ EOF
     if [[ "$DRY_RUN" = true ]]; then
         log_warn "[DRY-RUN] Se crearía ~/.zshrc.new y se validaría."
         log_warn "[DRY-RUN] Se crearía ~/.config/starship.toml."
-        log_verbose "--- Contenido de .zshrc.new (dry-run) ---"
-        log_verbose "$new_zshrc_content"
-        log_verbose "-----------------------------------------"
         return
     fi
     
