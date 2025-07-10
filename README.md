@@ -1,290 +1,116 @@
-# 🎨 Universal Shell GUI Framework
+# Universal Shell GUI Framework
 
-> **The definitive standard for beautiful, modern CLI interfaces in shell projects**
+A lightweight, cross-platform GUI framework for shell scripts that provides interactive menus, dialogs, and user interfaces without external dependencies.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Shell: Bash/Zsh](https://img.shields.io/badge/Shell-Bash%2FZsh-blue.svg)](https://www.gnu.org/software/bash/)
-[![GUI: Gum](https://img.shields.io/badge/GUI-Gum-green.svg)](https://github.com/charmbracelet/gum)
-[![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-orange.svg)](https://github.com/jagoff/universal-shell-gui-framework)
+## Features
 
-A universal framework for creating stunning, interactive command-line interfaces using `gum`. This framework provides a standardized approach to building modern, user-friendly shell applications with consistent design patterns, robust error handling, and intuitive 'q' quit functionality.
+- **Cross-platform compatibility**: Works on macOS, Linux, and Windows (with WSL)
+- **No external dependencies**: Pure shell implementation
+- **Interactive menus**: Hierarchical menu system with navigation
+- **Dialog boxes**: Confirmation, input, and selection dialogs
+- **Progress indicators**: Visual feedback for long-running operations
+- **Color support**: Automatic detection and graceful fallback
+- **Keyboard navigation**: Full keyboard support with arrow keys
+- **Customizable themes**: Easy theming and styling options
 
-## ✨ Features
+## Quick Start
 
-- 🎯 **Universal**: Works with any shell project (bash, zsh, etc.)
-- 🎨 **Beautiful**: Modern, colorful interfaces with emojis and icons
-- 🔧 **Robust**: Compatible with all versions of `gum`
-- 📱 **Interactive**: Menus, confirmations, multi-select, and more
-- 🛡️ **Safe**: TTY detection and error handling
-- 🚪 **Quit-friendly**: Press 'q' to exit any component
-- 📚 **Well-documented**: Complete examples and best practices
-- 🚀 **Fast**: Lightweight and efficient
-
-## 🚀 Quick Start
-
-### 1. Install Dependencies
 ```bash
-# Install gum (required)
-brew install gum
+# Source the framework
+source gui_framework.sh
 
-# Verify installation
-gum --version
+# Create a simple menu
+create_menu "Main Menu" "Option 1:Do something" "Option 2:Do something else" "Quit:exit"
 ```
 
-### 2. Include the Framework
-```bash
-#!/bin/bash
-# Your script with beautiful GUI
-
-# Include the framework
-source ./gui_framework.sh
-
-# Initialize the framework
-init_gui_framework
-
-# Use the functions
-main() {
-    local action=$(show_gui_menu \
-        "My Project" \
-        "Select the action you want to perform" \
-        "Choose an option:" \
-        "🚀 Install" \
-        "⚙️  Configure" \
-        "▶️  Run" \
-        "❌ Exit")
-    
-    case "$action" in
-        "🚀 Install") install_project ;;
-        "⚙️  Configure") configure_project ;;
-        "▶️  Run") run_project ;;
-        "❌ Exit") exit 0 ;;
-    esac
-}
-
-main "$@"
-```
-
-## 📁 Repository Structure
-
-```
-universal-shell-gui-framework/
-├── README.md                           # This file
-├── gui_framework.sh                    # Core framework (v1.1.0)
-├── LICENSE                             # MIT License
-├── examples/
-│   ├── demo_quit_functionality.sh      # Demo of 'q' quit feature
-│   └── zsh_starship_migration.sh       # Real-world example
-└── docs/
-    ├── UNIVERSAL_GUI_FRAMEWORK.md      # Complete framework guide
-    ├── GUI_SPECIFICATION.md            # GUI design specifications
-    ├── GUI_README.md                   # GUI usage guide
-    ├── ERROR_LOGGING.md                # Error handling guide
-    ├── INTERACTIVE_MODE_FIX.md         # Interactive mode solutions
-    ├── TERMINAL_HANG_FIX.md            # Terminal hang solutions
-    ├── PLUGIN_INSTALLATION_FIX.md      # Plugin installation fixes
-    └── ICONV_ERROR_FIX.md              # Iconv error solutions
-```
-
-## 🎯 Core Components
-
-### Menus
-```bash
-# Single selection menu
-local choice=$(show_gui_menu \
-    "Title" \
-    "Subtitle" \
-    "Header:" \
-    "Option 1" \
-    "Option 2" \
-    "Option 3")
-
-# Multi-selection menu
-local selections=$(show_gui_multi_select \
-    "Title" \
-    "Subtitle" \
-    "Header:" \
-    3 \
-    "Feature 1" \
-    "Feature 2" \
-    "Feature 3")
-```
-
-### Confirmations
-```bash
-if show_gui_confirmation "Do you want to continue?"; then
-    echo "User confirmed"
-else
-    echo "User cancelled or quit"
-fi
-```
-
-### Input
-```bash
-local name=$(show_gui_input "Enter your name:" "John Doe")
-```
-
-### Progress & Spinners
-```bash
-show_gui_spinner "Installing..." sleep 3
-show_gui_progress "Downloading..." 75
-```
-
-## 🚪 Quit Functionality
-
-**Press 'q' to exit any component!** This is now a standard feature across all GUI components:
-
-- **Menus**: `←→ toggle • enter submit • q Quit`
-- **Multi-select**: `←→ toggle • space select • enter submit • q Quit`
-- **Confirmations**: `y Yes, continue • n No, cancel • q Quit`
-- **Inputs**: `type and enter submit • q Quit`
-
-## 🎨 Design Principles
-
-### Color Scheme
-- 🔴 **Red**: Errors and critical alerts
-- 🟢 **Green**: Success and confirmations  
-- 🔵 **Blue**: Information and titles
-- 🟡 **Yellow**: Warnings and prompts
-- 🟣 **Purple**: Special highlights
-- ⚪ **Gray**: Secondary text
-
-### Icons & Emojis
-- 📋 Section headers
-- ✅ Success indicators
-- ❌ Error indicators
-- ⚠️  Warnings
-- 🔧 Configuration
-- 🚀 Actions
-- 🎯 Targets
-
-## 📚 Documentation
-
-- **[Universal GUI Framework](docs/UNIVERSAL_GUI_FRAMEWORK.md)** - Complete implementation guide
-- **[GUI Specification](docs/GUI_SPECIFICATION.md)** - Design and component specifications
-- **[GUI README](docs/GUI_README.md)** - GUI usage and examples
-- **[Error Logging](docs/ERROR_LOGGING.md)** - Error handling best practices
-
-## 🔧 Installation
+## Installation
 
 ### Option 1: Direct Download
 ```bash
-# Download the framework
-curl -O https://raw.githubusercontent.com/jagoff/universal-shell-gui-framework/main/gui_framework.sh
-
-# Make it executable
-chmod +x gui_framework.sh
-
-# Include in your script
-source ./gui_framework.sh
+curl -O https://raw.githubusercontent.com/jagoff/shell-gui-framework/main/gui_framework.sh
+source gui_framework.sh
 ```
 
 ### Option 2: Git Clone
 ```bash
-# Clone the repository
-git clone https://github.com/jagoff/universal-shell-gui-framework.git
-
-# Copy the framework to your project
-cp universal-shell-gui-framework/gui_framework.sh ./gui_framework.sh
-
-# Include in your script
-source ./gui_framework.sh
+git clone https://github.com/jagoff/shell-gui-framework.git
+cd shell-gui-framework
+source gui_framework.sh
 ```
 
-## 🎯 Usage Examples
-
-### Basic Menu with Quit
+### Option 3: Setup Script
 ```bash
-#!/bin/bash
-source ./gui_framework.sh
-init_gui_framework
-
-main() {
-    local action=$(show_gui_menu \
-        "My Application" \
-        "What would you like to do?" \
-        "Select an action:" \
-        "🚀 Start" \
-        "⚙️  Settings" \
-        "📊 Status" \
-        "❌ Quit")
-    
-    case "$action" in
-        "🚀 Start") start_app ;;
-        "⚙️  Settings") open_settings ;;
-        "📊 Status") show_status ;;
-        "❌ Quit") exit 0 ;;
-    esac
-}
-
-main "$@"
+curl -sSL https://raw.githubusercontent.com/jagoff/shell-gui-framework/main/setup-gui.sh | bash
 ```
 
-### Multi-Step Process with Quit
+## Examples
+
+Check the `examples/` directory for complete working examples:
+
+- `basic_menu_example.sh` - Simple menu demonstration
+- `demo_quit_functionality.sh` - Advanced menu with quit handling
+
+## Documentation
+
+- [GUI Specification](docs/GUI_SPECIFICATION.md) - Technical details and API reference
+- [GUI README](docs/GUI_README.md) - User guide and examples
+- [Universal GUI Framework](docs/UNIVERSAL_GUI_FRAMEWORK.md) - Architecture overview
+
+## Usage
+
+### Basic Menu
 ```bash
-#!/bin/bash
-source ./gui_framework.sh
-init_gui_framework
+source gui_framework.sh
 
-deploy_app() {
-    # Step 1: Environment selection
-    local env=$(show_gui_menu \
-        "Deployment" \
-        "Select deployment environment" \
-        "Environment:" \
-        "🟢 Development" \
-        "🟡 Staging" \
-        "🔴 Production")
-    
-    # Step 2: Confirmation
-    if show_gui_confirmation "Deploy to $env?"; then
-        # Step 3: Progress
-        show_gui_spinner "Deploying to $env..." sleep 5
-        log_success "Deployment completed!"
-    fi
-}
+# Simple menu
+create_menu "Choose an option:" \
+    "Install:install_package" \
+    "Configure:configure_system" \
+    "Quit:exit"
 ```
 
-### Try the Demo
+### Confirmation Dialog
 ```bash
-# Run the quit functionality demo
-./examples/demo_quit_functionality.sh
+if show_confirmation "Do you want to proceed?"; then
+    echo "User confirmed"
+else
+    echo "User cancelled"
+fi
 ```
 
-## 🔄 Version History
+### Input Dialog
+```bash
+user_input=$(show_input_dialog "Enter your name:")
+echo "Hello, $user_input!"
+```
 
-### v1.1.0 (Current)
-- ✅ Added 'q' quit functionality to all GUI components
-- ✅ Updated legends to show quit instructions
-- ✅ Translated all confirmation options to English
-- ✅ Enhanced error handling and user experience
-- ✅ Added comprehensive demo script
+### Progress Bar
+```bash
+show_progress_bar "Processing..." 0
+# ... do work ...
+show_progress_bar "Processing..." 50
+# ... more work ...
+show_progress_bar "Processing..." 100
+```
 
-### v1.0.0
-- ✅ Initial release with core GUI components
-- ✅ Universal color scheme and logging
-- ✅ Gum version compatibility detection
-- ✅ TTY detection and error handling
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Support
 
-- [Charmbracelet](https://charm.sh/) for the amazing `gum` tool
-- The shell scripting community for best practices
-- All contributors who help improve this framework
+- **Issues**: [GitHub Issues](https://github.com/jagoff/shell-gui-framework/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/jagoff/shell-gui-framework/discussions)
 
----
+## Related Projects
 
-**Made with ❤️ for the shell community**
-
-> *"Beautiful interfaces shouldn't be limited to web apps"* 
+This framework is used by:
+- [zsh-starship-migration](https://github.com/jagoff/zsh-starship-migration) - ZSH to Starship migration tool 

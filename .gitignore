@@ -1,13 +1,3 @@
-# Logs
-*.log
-error.log
-auto_error_fixer.log
-
-# Temporary files
-*.tmp
-*.temp
-*~
-
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -17,56 +7,30 @@ auto_error_fixer.log
 ehthumbs.db
 Thumbs.db
 
-# Backup files
-*.bak
-*.backup
-*.old
-
-# Test artifacts
-test_*.log
-coverage/
-.coverage
-
-# IDE files
+# Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Shell history
-.bash_history
-.zsh_history
+# Temporary files
+*.tmp
+*.temp
+*.log
 
-# Environment files
-.env
-.env.local
-.env.*.local
+# Backup files
+*.bak
+*.backup
 
-# Node modules (if any)
-node_modules/
+# Test files
+test_*.sh
+*_test.sh
 
-# Python cache (if any)
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
+# Documentation build
+docs/_build/
+docs/.doctrees/
 
-# Compiled files
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
-
-# Archives
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
+# Package files
+*.tar.gz
 *.zip 
