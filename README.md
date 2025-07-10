@@ -1,315 +1,277 @@
-# Zsh Starship Migration - Professional Edition
+# 🎨 Universal Shell GUI Framework
 
-A professional-grade script for migrating from Oh My Zsh to a modern Zsh setup with Starship, built following industry best practices for shell scripting.
+> **The definitive standard for beautiful, modern CLI interfaces in shell projects**
 
-## ✨ Características
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Shell: Bash/Zsh](https://img.shields.io/badge/Shell-Bash%2FZsh-blue.svg)](https://www.gnu.org/software/bash/)
+[![GUI: Gum](https://img.shields.io/badge/GUI-Gum-green.svg)](https://github.com/charmbracelet/gum)
+[![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-orange.svg)](https://github.com/jagoff/universal-shell-gui-framework)
 
-### 🔧 **Detección y Solución Automática de Problemas**
-- **Plugin rand-quote**: Detecta y deshabilita automáticamente el plugin que causa errores de `iconv`
-- **Módulos custom de Starship**: Remueve módulos no disponibles (`custom_public_ip`, `custom_weather`)
-- **Configuración de locale**: Asegura que UTF-8 esté configurado correctamente
-- **Validación post-migración**: Verifica que todos los problemas se hayan solucionado
+A universal framework for creating stunning, interactive command-line interfaces using `gum`. This framework provides a standardized approach to building modern, user-friendly shell applications with consistent design patterns, robust error handling, and intuitive 'q' quit functionality.
 
-### 🚀 **Migración Inteligente**
-- **Análisis automático** de la configuración actual de Oh My Zsh
-- **Preservación de aliases, exports y funciones** personalizadas
-- **Backup automático** antes de cualquier cambio
-- **Rollback completo** en caso de problemas
+## ✨ Features
 
-### ⚡ **Configuración Optimizada**
-- **Plugins de Zsh** modernos y productivos
-- **Herramientas de desarrollo** actualizadas (eza, bat, fd, rg, fzf)
-- **Prompt de Starship** personalizable y funcional
-- **Integración completa** con Git, Kubernetes, Docker, AWS
+- 🎯 **Universal**: Works with any shell project (bash, zsh, etc.)
+- 🎨 **Beautiful**: Modern, colorful interfaces with emojis and icons
+- 🔧 **Robust**: Compatible with all versions of `gum`
+- 📱 **Interactive**: Menus, confirmations, multi-select, and more
+- 🛡️ **Safe**: TTY detection and error handling
+- 🚪 **Quit-friendly**: Press 'q' to exit any component
+- 📚 **Well-documented**: Complete examples and best practices
+- 🚀 **Fast**: Lightweight and efficient
 
-### 🎯 **Modo Interactivo y Automático**
-- **Modo interactivo** por defecto para control total y personalización
-- **Modo automático** (`--auto`) para instalaciones sin intervención
-- **Modo dry-run** (`--dry-run`) para verificar cambios sin aplicarlos
-- **Modo verbose** (`--verbose`) para información detallada
+## 🚀 Quick Start
 
-## 📋 Requirements
+### 1. Install Dependencies
+```bash
+# Install gum (required)
+brew install gum
 
-- **macOS** (10.15 Catalina or later)
-- **Homebrew** ([install here](https://brew.sh/))
-- **Zsh** (usually pre-installed on macOS)
+# Verify installation
+gum --version
+```
 
-## 🛠️ Installation
+### 2. Include the Framework
+```bash
+#!/bin/bash
+# Your script with beautiful GUI
 
-### Quick Start
+# Include the framework
+source ./gui_framework.sh
+
+# Initialize the framework
+init_gui_framework
+
+# Use the functions
+main() {
+    local action=$(show_gui_menu \
+        "My Project" \
+        "Select the action you want to perform" \
+        "Choose an option:" \
+        "🚀 Install" \
+        "⚙️  Configure" \
+        "▶️  Run" \
+        "❌ Exit")
+    
+    case "$action" in
+        "🚀 Install") install_project ;;
+        "⚙️  Configure") configure_project ;;
+        "▶️  Run") run_project ;;
+        "❌ Exit") exit 0 ;;
+    esac
+}
+
+main "$@"
+```
+
+## 📁 Repository Structure
+
+```
+universal-shell-gui-framework/
+├── README.md                           # This file
+├── gui_framework.sh                    # Core framework (v1.1.0)
+├── LICENSE                             # MIT License
+├── examples/
+│   ├── demo_quit_functionality.sh      # Demo of 'q' quit feature
+│   └── zsh_starship_migration.sh       # Real-world example
+└── docs/
+    ├── UNIVERSAL_GUI_FRAMEWORK.md      # Complete framework guide
+    ├── GUI_SPECIFICATION.md            # GUI design specifications
+    ├── GUI_README.md                   # GUI usage guide
+    ├── ERROR_LOGGING.md                # Error handling guide
+    ├── INTERACTIVE_MODE_FIX.md         # Interactive mode solutions
+    ├── TERMINAL_HANG_FIX.md            # Terminal hang solutions
+    ├── PLUGIN_INSTALLATION_FIX.md      # Plugin installation fixes
+    └── ICONV_ERROR_FIX.md              # Iconv error solutions
+```
+
+## 🎯 Core Components
+
+### Menus
+```bash
+# Single selection menu
+local choice=$(show_gui_menu \
+    "Title" \
+    "Subtitle" \
+    "Header:" \
+    "Option 1" \
+    "Option 2" \
+    "Option 3")
+
+# Multi-selection menu
+local selections=$(show_gui_multi_select \
+    "Title" \
+    "Subtitle" \
+    "Header:" \
+    3 \
+    "Feature 1" \
+    "Feature 2" \
+    "Feature 3")
+```
+
+### Confirmations
+```bash
+if show_gui_confirmation "Do you want to continue?"; then
+    echo "User confirmed"
+else
+    echo "User cancelled or quit"
+fi
+```
+
+### Input
+```bash
+local name=$(show_gui_input "Enter your name:" "John Doe")
+```
+
+### Progress & Spinners
+```bash
+show_gui_spinner "Installing..." sleep 3
+show_gui_progress "Downloading..." 75
+```
+
+## 🚪 Quit Functionality
+
+**Press 'q' to exit any component!** This is now a standard feature across all GUI components:
+
+- **Menus**: `←→ toggle • enter submit • q Quit`
+- **Multi-select**: `←→ toggle • space select • enter submit • q Quit`
+- **Confirmations**: `y Yes, continue • n No, cancel • q Quit`
+- **Inputs**: `type and enter submit • q Quit`
+
+## 🎨 Design Principles
+
+### Color Scheme
+- 🔴 **Red**: Errors and critical alerts
+- 🟢 **Green**: Success and confirmations  
+- 🔵 **Blue**: Information and titles
+- 🟡 **Yellow**: Warnings and prompts
+- 🟣 **Purple**: Special highlights
+- ⚪ **Gray**: Secondary text
+
+### Icons & Emojis
+- 📋 Section headers
+- ✅ Success indicators
+- ❌ Error indicators
+- ⚠️  Warnings
+- 🔧 Configuration
+- 🚀 Actions
+- 🎯 Targets
+
+## 📚 Documentation
+
+- **[Universal GUI Framework](docs/UNIVERSAL_GUI_FRAMEWORK.md)** - Complete implementation guide
+- **[GUI Specification](docs/GUI_SPECIFICATION.md)** - Design and component specifications
+- **[GUI README](docs/GUI_README.md)** - GUI usage and examples
+- **[Error Logging](docs/ERROR_LOGGING.md)** - Error handling best practices
+
+## 🔧 Installation
+
+### Option 1: Direct Download
+```bash
+# Download the framework
+curl -O https://raw.githubusercontent.com/jagoff/universal-shell-gui-framework/main/gui_framework.sh
+
+# Make it executable
+chmod +x gui_framework.sh
+
+# Include in your script
+source ./gui_framework.sh
+```
+
+### Option 2: Git Clone
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/zsh-starship-migration.git
-cd zsh-starship-migration
+git clone https://github.com/jagoff/universal-shell-gui-framework.git
 
-# Install the script
-make install
+# Copy the framework to your project
+cp universal-shell-gui-framework/gui_framework.sh ./gui_framework.sh
 
-# Run the migration
-./zsh-starship-migration.sh
+# Include in your script
+source ./gui_framework.sh
 ```
 
-### Development Setup
+## 🎯 Usage Examples
+
+### Basic Menu with Quit
 ```bash
-# Set up development environment
-make setup
+#!/bin/bash
+source ./gui_framework.sh
+init_gui_framework
 
-# Install development dependencies
-make install-dev
+main() {
+    local action=$(show_gui_menu \
+        "My Application" \
+        "What would you like to do?" \
+        "Select an action:" \
+        "🚀 Start" \
+        "⚙️  Settings" \
+        "📊 Status" \
+        "❌ Quit")
+    
+    case "$action" in
+        "🚀 Start") start_app ;;
+        "⚙️  Settings") open_settings ;;
+        "📊 Status") show_status ;;
+        "❌ Quit") exit 0 ;;
+    esac
+}
 
-# Run tests
-make test
-
-# Check code quality
-make lint
+main "$@"
 ```
 
-## 🎯 Usage
-
-### Basic Migration
+### Multi-Step Process with Quit
 ```bash
-# Run migration in interactive mode (default)
-./zsh-starship-migration.sh
+#!/bin/bash
+source ./gui_framework.sh
+init_gui_framework
 
-# Preview what would be done (dry-run)
-./zsh-starship-migration.sh --dry-run
-
-# Run automatically without prompts
-./zsh-starship-migration.sh --auto
+deploy_app() {
+    # Step 1: Environment selection
+    local env=$(show_gui_menu \
+        "Deployment" \
+        "Select deployment environment" \
+        "Environment:" \
+        "🟢 Development" \
+        "🟡 Staging" \
+        "🔴 Production")
+    
+    # Step 2: Confirmation
+    if show_gui_confirmation "Deploy to $env?"; then
+        # Step 3: Progress
+        show_gui_spinner "Deploying to $env..." sleep 5
+        log_success "Deployment completed!"
+    fi
+}
 ```
 
-### Advanced Options
+### Try the Demo
 ```bash
-# Skip installation of modern CLI tools
-./zsh-starship-migration.sh --skip-tools
-
-# Enable verbose logging
-./zsh-starship-migration.sh --verbose
-
-# Set custom log level
-./zsh-starship-migration.sh --log-level debug
+# Run the quit functionality demo
+./examples/demo_quit_functionality.sh
 ```
 
-### Management Commands
-```bash
-# Check current status
-./zsh-starship-migration.sh status
+## 🔄 Version History
 
-# Generate detailed report
-./zsh-starship-migration.sh report
+### v1.1.0 (Current)
+- ✅ Added 'q' quit functionality to all GUI components
+- ✅ Updated legends to show quit instructions
+- ✅ Translated all confirmation options to English
+- ✅ Enhanced error handling and user experience
+- ✅ Added comprehensive demo script
 
-# Show configuration
-./zsh-starship-migration.sh config
-
-# List available backups
-./zsh-starship-migration.sh backup-list
-
-# Show backup information
-./zsh-starship-migration.sh backup-info <backup-name>
-
-# Restore from backup
-./zsh-starship-migration.sh rollback
-```
-
-## 🏗️ Project Structure
-
-```
-zsh-starship-migration/
-├── src/
-│   ├── lib/                    # Core library modules
-│   │   ├── logger.sh          # Professional logging system
-│   │   ├── error_handler.sh   # Error handling and validation
-│   │   └── config.sh          # Configuration management
-│   └── modules/               # Feature modules
-│       ├── system_validator.sh # System validation
-│       └── backup_manager.sh   # Backup and rollback
-├── tests/                     # Test suite
-│   └── test_runner.sh         # Test runner
-├── docs/                      # Generated documentation
-├── dist/                      # Distribution files
-├── zsh-starship-migration.sh  # Main script
-├── Makefile                   # Build system
-├── README.md                  # This file
-├── CHANGELOG.md              # Version history
-└── LICENSE                   # MIT License
-```
-
-## 🧪 Testing
-
-### Run All Tests
-```bash
-make test
-```
-
-### Run Specific Tests
-```bash
-# Module tests only
-make test-modules
-
-# Integration tests only
-make test-integration
-
-# Quick syntax tests
-make quick-test
-```
-
-### Manual Testing
-```bash
-# Run test suite directly
-./tests/test_runner.sh
-
-# Run specific test categories
-./tests/test_runner.sh --modules
-./tests/test_runner.sh --integration
-```
-
-## 🔧 Development
-
-### Code Quality
-```bash
-# Check code quality
-make lint
-
-# Format code
-make format
-
-# Run shellcheck
-make shellcheck
-
-# Check formatting
-make shfmt-check
-```
-
-### Build and Package
-```bash
-# Build distribution
-make build
-
-# Create package
-make package
-
-# Prepare release
-make release
-```
-
-### Development Workflow
-```bash
-# Set up development environment
-make setup
-
-# Start development mode (watch for changes)
-make dev
-
-# Run in debug mode
-make debug
-
-# Check project status
-make status
-```
-
-## 📊 What Gets Migrated
-
-### Preserved Configuration
-- ✅ User aliases
-- ✅ Environment variables (exports)
-- ✅ Custom functions
-- ✅ Oh My Zsh plugins
-- ✅ Existing Zsh configuration
-
-### New Features
-- 🚀 Starship prompt with modern styling
-- 🛠️ Modern CLI tools (eza, bat, fd, ripgrep, fzf)
-- 🔌 Essential Zsh plugins
-- 🎨 Enhanced terminal experience
-- 📱 Responsive and informative prompt
-
-### Installed Tools
-- **eza**: Modern `ls` replacement with icons
-- **bat**: Enhanced `cat` with syntax highlighting
-- **fd**: Fast `find` alternative
-- **ripgrep**: High-performance `grep` replacement
-- **fzf**: Fuzzy finder for command line
-
-## 🔒 Safety Features
-
-### Backup System
-- **Automatic Backups**: Creates timestamped backups before any changes
-- **Metadata Tracking**: Detailed backup information and system state
-- **Rollback Support**: Easy restoration from any backup
-- **Retention Policy**: Automatic cleanup of old backups
-
-### Error Handling
-- **Comprehensive Validation**: System requirements and dependencies
-- **Graceful Failures**: Detailed error messages and recovery options
-- **Safe Execution**: Dry-run mode for testing
-- **Progress Tracking**: Real-time status updates
-
-## 🎛️ Configuration
-
-### Environment Variables
-```bash
-# Set log level
-export LOG_LEVEL=debug
-
-# Enable auto mode
-export AUTO_MODE=true
-
-# Skip tools installation
-export SKIP_TOOLS=true
-
-# Enable dry run
-export DRY_RUN=true
-```
-
-### Configuration File
-The script creates a configuration file at `~/.config/zsh-starship-migration/config.conf` that can be customized.
-
-## 📈 Performance
-
-- **Fast Execution**: Optimized for speed with minimal dependencies
-- **Efficient Backups**: Smart backup strategy with compression
-- **Minimal Footprint**: Lightweight installation and operation
-- **Quick Rollback**: Fast restoration from backups
+### v1.0.0
+- ✅ Initial release with core GUI components
+- ✅ Universal color scheme and logging
+- ✅ Gum version compatibility detection
+- ✅ TTY detection and error handling
 
 ## 🤝 Contributing
 
-### Development Setup
-```bash
-# Fork and clone the repository
-git clone https://github.com/your-fork/zsh-starship-migration.git
-cd zsh-starship-migration
-
-# Set up development environment
-make setup
-
-# Run tests to ensure everything works
-make test
-```
-
-### Code Standards
-- Follow shell scripting best practices
-- Use the provided logging system
-- Add tests for new features
-- Update documentation
-- Run `make lint` before committing
-
-### Testing Your Changes
-```bash
-# Run all tests
-make test
-
-# Run specific tests
-make test-syntax
-make test-modules
-make test-integration
-
-# Check code quality
-make lint
-```
-
-## 📝 Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
@@ -317,29 +279,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Starship**: For the amazing cross-shell prompt
-- **Oh My Zsh**: For the foundation that many users start with
-- **Shell scripting community**: For best practices and inspiration
-
-## 🆘 Support
-
-### Common Issues
-- **Homebrew not found**: Install from [brew.sh](https://brew.sh/)
-- **Permission denied**: Run `chmod +x zsh-starship-migration.sh`
-- **Backup failed**: Check disk space and permissions
-
-### Getting Help
-- Check the [status command](#management-commands) for system information
-- Use [dry-run mode](#basic-migration) to preview changes
-- Review the [backup system](#backup-system) for rollback options
-
-### Reporting Issues
-Please include:
-- macOS version
-- Error messages
-- Output of `./zsh-starship-migration.sh status`
-- Steps to reproduce
+- [Charmbracelet](https://charm.sh/) for the amazing `gum` tool
+- The shell scripting community for best practices
+- All contributors who help improve this framework
 
 ---
 
-**Built with ❤️ following professional shell scripting practices** 
+**Made with ❤️ for the shell community**
+
+> *"Beautiful interfaces shouldn't be limited to web apps"* 

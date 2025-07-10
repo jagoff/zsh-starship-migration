@@ -1,179 +1,87 @@
-# CHANGELOG
+# Changelog
 
-## [1.2.8] - 2025-01-09
-### Corregido
-- **Inconsistencia en el comportamiento de la interfaz gráfica** - Sistema de modos interactivo/automático completamente reescrito
-- **Detección automática de contexto inconsistente** - Ahora detecta correctamente si está en un contexto interactivo
-- **Falta de opción para forzar modo interactivo** - Agregada opción `--interactive`
-- **Manejo de dependencias inconsistente** - Ahora se manejan correctamente en ambos modos
+All notable changes to the Universal Shell GUI Framework will be documented in this file.
 
-### Añadido
-- **Detección automática mejorada** - Detecta automáticamente contextos no interactivos (CI, NONINTERACTIVE, ! -t 0)
-- **Opción `--interactive`** - Permite forzar el modo interactivo incluso en contextos no interactivos
-- **Feedback visual del modo** - Muestra claramente si está ejecutándose en modo automático o interactivo
-- **Documentación completa** - Nuevo archivo `docs/INTERACTIVE_MODE_FIX.md` explicando el sistema de modos
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Mejorado
-- **Comportamiento predecible** - El script ahora es consistente en su comportamiento
-- **Control explícito de modos** - Se puede forzar cualquier modo independientemente del contexto
-- **Logs más claros** - Indica claramente en qué modo se está ejecutando
-- **Manejo robusto de dependencias** - Las dependencias se manejan correctamente en ambos modos
+## [1.1.0] - 2024-07-10
 
----
+### Added
+- 🚪 **'q' Quit Functionality**: Users can now exit any GUI component by pressing 'q'
+- 📋 **Enhanced Legends**: All components now show clear navigation instructions
+- 🌍 **English Standard**: All confirmation options translated to English ("Yes, continue", "No, cancel")
+- 🎯 **New Function**: `show_gui_menu_with_quit()` for menus with explicit quit option
+- 📚 **Demo Script**: `examples/demo_quit_functionality.sh` showcasing quit functionality
+- 🔄 **Exit Handling**: `handle_quit()` function for consistent exit behavior
 
-## [1.2.7] - 2025-01-09
-### Corregido
-- **Módulo `openai` inexistente en Starship** - Eliminado módulo que causaba warnings
-- **Warnings de configuración de Starship** - Configuración completamente limpia
-- **Prompt con errores cortados** - Sin warnings ni errores en el prompt
+### Changed
+- 🔄 **Legends Updated**: 
+  - Menus: `←→ toggle • enter submit • q Quit`
+  - Multi-select: `←→ toggle • space select • enter submit • q Quit`
+  - Confirmations: `y Yes, continue • n No, cancel • q Quit`
+  - Inputs: `type and enter submit • q Quit`
+- 🔄 **Confirmation Options**: Standardized to English only
+- 🔄 **Version Bump**: Framework version updated to 1.1.0
 
-### Mejorado
-- Configuración de Starship más estable y compatible
-- Solo módulos disponibles y funcionales
-- Prompt completamente limpio y funcional
+### Fixed
+- 🐛 **User Experience**: Consistent exit behavior across all components
+- 🐛 **Language Consistency**: All user-facing text now in English
+- 🐛 **Navigation Clarity**: Clear instructions for all interactions
 
----
+### Documentation
+- 📚 **README Updated**: Added quit functionality documentation
+- 📚 **Version History**: Added to README with detailed changelog
+- 📚 **Examples Enhanced**: All examples now include quit functionality
 
-## [1.2.6] - 2025-01-09
-### Corregido
-- **Migración automática no activaba todos los módulos** - Función `handle_dependencies()` corregida
-- **Módulos faltantes en configuración de Starship** - Agregados Docker, AWS, AI/ML, Jobs, Usuario, Host
-- **Dependencias se ejecutaban en modo automático** - Ahora solo se ejecutan en modo interactivo
-- **Formatos de Starship con variables incorrectas** - Corregidos `${variable}` por `$variable`
-- **Detección de módulos incompleta** - Función `get_starship_module_state()` actualizada
+## [1.0.0] - 2024-07-10
 
-### Mejorado
-- Migración automática ahora activa correctamente todos los módulos disponibles
-- Lista de customizaciones refleja el estado real de todos los módulos
-- Configuración de Starship más completa y funcional
-- Sistema de logging más preciso sin falsos positivos
+### Added
+- 🎨 **Core Framework**: Universal Shell GUI Framework for bash/zsh
+- 🎯 **GUI Components**: 
+  - `show_gui_menu()` - Single selection menus
+  - `show_gui_multi_select()` - Multi-selection menus
+  - `show_gui_confirmation()` - Confirmation dialogs
+  - `show_gui_input()` - Text input prompts
+  - `show_gui_spinner()` - Loading spinners
+  - `show_gui_progress()` - Progress bars
+- 🌈 **Color System**: Universal color variables for consistent theming
+- 📝 **Logging Functions**: Standardized logging with emojis and colors
+- 🔧 **Dependency Management**: Automatic gum installation and version detection
+- 🛡️ **Error Handling**: TTY detection and robust error management
+- 🔄 **Gum Compatibility**: Support for all gum versions with fallbacks
 
----
+### Features
+- 🎨 **Modern Design**: Beautiful, colorful interfaces with emojis and icons
+- 🔧 **Robust**: Compatible with all versions of gum
+- 📱 **Interactive**: Full interactive terminal support
+- 🛡️ **Safe**: TTY detection and error handling
+- 🚀 **Fast**: Lightweight and efficient
+- 📚 **Well-documented**: Complete examples and best practices
 
-## [1.2.5] - 2025-01-09
-### Corregido
-- **Formatos vacíos en configuración de Starship** (format, right_format, cmd_duration, time, battery)
-- **Lista de customizaciones no se actualizaba** - Función `get_starship_module_state()` mejorada
-- **Warnings incorrectos** de módulos no habilitados que aparecían como errores
-- **Prompt con warnings cortados** - Configuración de Starship completamente limpia
-- **Detección incorrecta del estado de módulos** - Ahora lee correctamente la configuración actual
+### Documentation
+- 📚 **README.md**: Comprehensive project documentation
+- 📚 **Framework Guide**: Complete implementation guide
+- 📚 **GUI Specification**: Design and component specifications
+- 📚 **Error Logging Guide**: Error handling best practices
+- 📚 **Examples**: Real-world usage examples
 
-### Mejorado
-- Función `get_starship_module_state()` ahora detecta correctamente el estado real de cada módulo
-- Configuración de Starship más robusta con formatos válidos
-- Lista de customizaciones refleja el estado real del sistema
-- Prompt completamente funcional sin errores ni warnings
-
----
-
-## [1.2.4] - 2025-01-09
-### Añadido
-- Sistema de logging mejorado con funciones específicas para diferentes tipos de mensajes
-- Validación automática de configuración de Starship con `validate_starship_config()`
-- Función `comprehensive_logging()` para diagnóstico completo del sistema
-- Función `log_starship_errors()` para capturar warnings y errores de Starship
-- Función `log_system_errors()` para detectar problemas del sistema
-- Detección automática de formatos problemáticos en configuración de Starship
-- Verificación de módulos custom problemáticos y alias conflictivos
-- Integración del logging completo en la validación post-migración
-
-### Corregido
-- Formato problemático en módulo kubernetes de Starship (línea 40)
-- Sistema de logging ahora captura todos los errores y warnings del sistema
-- Validación mejorada que detecta problemas antes de que causen errores
-- Logging más detallado y específico para cada tipo de problema
-- Error de caracteres de escape en función `comprehensive_logging()`
-- Prompt limpio sin warnings cortados de Starship
-
-### Mejorado
-- Configuración de Starship más estable y sin warnings
-- Script genera configuración limpia y válida por defecto
-- Mejor manejo de caracteres especiales en formatos de Starship
+### Examples
+- 🎯 **Demo Script**: `examples/demo_quit_functionality.sh`
+- 🚀 **Real-world Example**: `examples/zsh_starship_migration.sh`
 
 ---
 
-## [1.2.3] - 2025-01-09
-### Corregido
-- Errores de sintaxis en configuración de Starship (schema, format, kubernetes)
-- Módulos custom problemáticos deshabilitados por defecto (custom_public_ip, custom_weather)
-- Format vacío en prompt principal y right_format
-- Error de sintaxis en formato de kubernetes con caracteres especiales
-- Warnings de Starship que causaban problemas en el prompt
+## Versioning
 
-### Mejorado
-- Configuración de Starship más estable y sin warnings
-- Script genera configuración limpia y válida por defecto
-- Mejor manejo de caracteres especiales en formatos de Starship
+- **Major**: Breaking changes or major new features
+- **Minor**: New features, backwards compatible
+- **Patch**: Bug fixes and minor improvements
+
+## Contributing
+
+When contributing to this project, please update this changelog with a new entry under the appropriate version section.
 
 ---
 
-## [1.2.2] - 2025-01-09
-### Corregido
-- Funciones duplicadas en .zshrc que causaban terminal colgada o sin prompt
-- Filtrado automático de funciones del usuario para evitar conflictos con funciones base del script
-- Mejorada la extracción de funciones para manejar correctamente llaves anidadas
-- Eliminación de módulos custom problemáticos de Starship (custom_public_ip, custom_weather)
-
-### Mejorado
-- Script más robusto que evita generar duplicados en la configuración
-- Mejor manejo de funciones complejas con múltiples llaves
-- Validación mejorada de sintaxis antes de aplicar cambios
-
----
-
-## [1.2.1] - 2025-01-08
-### Corregido
-- Error de instalación de plugins de Zsh con mensajes "Read-only file system" y "No such file or directory"
-- Configuración de Starship con claves duplicadas que causaba errores de parsing TOML
-- Variables hardcodeadas en el script que causaban problemas de expansión
-- Mejorado el manejo de errores en la instalación de plugins con validaciones adicionales
-
-### Mejorado
-- Agregadas validaciones para verificar que el directorio de plugins existe y es escribible
-- Logs más detallados para debugging de problemas de instalación
-- Detección automática y corrección de problemas comunes en la configuración
-- Documentación actualizada con soluciones para problemas conocidos
-
----
-
-## [1.2.0] - 2025-06-17
-### Añadido
-- Cabecera profesional y autodescriptiva, con instrucciones rápidas y advertencias.
-- Opción `report` para generar un reporte detallado del estado de la migración, herramientas, alias y entorno.
-- README completo y claro para usuarios de cualquier nivel.
-- Compatibilidad multiplataforma para cualquier Mac (Intel o Apple Silicon).
-
-### Mejorado
-- Alias de `ls`, `la`, `ll`, `l` ahora usan `eza` (sustituyendo a `exa`), eliminando conflictos y warnings.
-- Extracción de funciones en `.zshrc` ahora es robusta y soporta casos complejos.
-- Logs más detallados y manejo de errores explícito en cada paso.
-- Validación y reporte de herramientas modernas instaladas.
-
-### Corregido
-- Eliminados alias antiguos de `exa` tras la migración para evitar conflictos.
-- Corrección de PATH y variables de entorno duplicadas.
-
----
-
-## [1.1.0] - 2025-06-16
-### Añadido
-- Instalación automática de Starship, plugins modernos y herramientas CLI (`exa`, `bat`, `fd`, `ripgrep`, `fzf`).
-- Backup seguro de `.zshrc`, `.oh-my-zsh` y `starship.toml` antes de cualquier cambio.
-- Rollback automático a la configuración anterior.
-- Opción `--dry-run` para simular la migración sin hacer cambios.
-- Opción `--skip-tools` para migrar solo el prompt y plugins.
-- Opción `status` para mostrar el estado actual de la configuración.
-
-### Mejorado
-- Generación automática de `.zshrc` y `starship.toml` con alias, exports y funciones migradas.
-- Mensajes de log claros y coloridos para cada paso.
-
----
-
-## [1.0.0] - 2025-06-15
-### Añadido
-- Versión inicial del script de migración de Oh My Zsh a Starship.
-- Validación de sistema y dependencias.
-- Extracción básica de alias y exports del `.zshrc`.
-- Instalación de Starship y plugins esenciales de Zsh.
-- Generación de nuevo `.zshrc` y configuración básica de Starship. 
+**For more information, see [README.md](README.md)** 

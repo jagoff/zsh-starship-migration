@@ -455,7 +455,7 @@ log_system_errors() {
 
 # Función para validar configuración de Starship
 validate_starship_config() {
-    # Validando configuración de Starship...
+    log_verbose "Validando configuración de Starship..."
     
     # Verificar que el archivo de configuración existe
     if [[ ! -f "$HOME/.config/starship.toml" ]]; then
@@ -465,31 +465,31 @@ validate_starship_config() {
     
     # Verificar que el formato no esté vacío
     if grep -q '^format = ""' "$HOME/.config/starship.toml"; then
-        log_error "Starship format is empty - fixing automatically"
+        log_error "Formato de Starship está vacío - corrigiendo automáticamente"
         fix_starship_format
         return 1
     fi
     
     # Verificar que el formato tenga contenido válido
     if ! grep -q '^format = ".*\$.*"' "$HOME/.config/starship.toml"; then
-        log_error "Starship format has no valid variables - fixing automatically"
+        log_error "Formato de Starship no tiene variables válidas - corrigiendo automáticamente"
         fix_starship_format
         return 1
     fi
     
     # Verificar que no haya errores de configuración
     if ! log_starship_errors; then
-        log_error "Starship configuration has errors"
+        log_error "Configuración de Starship tiene errores"
         return 1
     fi
     
-            log_verbose "Starship configuration is valid"
+    log_verbose "Configuración de Starship válida"
     return 0
 }
 
 # Función para corregir automáticamente el formato de Starship
 fix_starship_format() {
-    log_info "🔧 Fixing Starship format..."
+    log_info "🔧 Corrigiendo formato de Starship..."
     
     # Crear formato básico si no existe
     local starship_config="$HOME/.config/starship.toml"
@@ -536,12 +536,12 @@ disabled = false
 
 [cmd_duration]
 min_time = 500
-format = "⏱ [$duration](\$style) "
+format = "⏱ [$duration]($style) "
 style = "yellow bold"
 
 [time]
 disabled = false
-format = "🕒 [\$time](\$style) "
+format = "🕒 [$time]($style) "
 style = "bold blue"
 
 [battery]
@@ -549,18 +549,17 @@ disabled = false
 full_symbol = "🔋"
 charging_symbol = "⚡"
 discharging_symbol = "🔌"
-format = "[\$symbol\$percentage](\$style) "
-style = "bold green"
+format = "[$symbol$percentage]($style) "
 
 [username]
 disabled = false
-format = "[\$user](\$style) "
+format = "[$user]($style) "
 style_user = "bold green"
 show_always = false
 
 [hostname]
 disabled = false
-format = "[\$hostname](\$style) "
+format = "[$hostname]($style) "
 style = "bold blue"
 ssh_only = true
 EOF
@@ -570,29 +569,29 @@ EOF
     
     # Corregir formato vacío
     if grep -q '^format = ""' "$starship_config"; then
-        log_info "Fixing empty format..."
+        log_info "Corrigiendo formato vacío..."
         sed -i '' 's/format = ""/format = "$username$hostname$directory$git_branch$git_status$nodejs$python$docker_context$kubernetes$terraform$cmd_duration$character"/' "$starship_config"
-        log_success "Format fixed"
+        log_success "Formato corregido"
     fi
     
     # Corregir right_format vacío o duplicado
     if grep -q '^right_format = ""' "$starship_config" || grep -q 'right_format = ".*\$username.*"' "$starship_config"; then
-        log_info "Fixing right format..."
+        log_info "Corrigiendo right_format..."
         sed -i '' 's/right_format = ".*"/right_format = "$cmd_duration$time$battery"/' "$starship_config"
-        log_success "Right format fixed"
+        log_success "Right format corregido"
     fi
     
     # Corregir configuración de battery si tiene claves inválidas
     if grep -q "charging_style\|discharging_style\|unknown_style" "$starship_config"; then
-        log_info "Fixing battery config..."
+        log_info "Corrigiendo configuración de battery..."
         sed -i '' '/charging_style = /d' "$starship_config"
         sed -i '' '/discharging_style = /d' "$starship_config"
         sed -i '' '/unknown_style = /d' "$starship_config"
-        log_success "Battery config fixed"
+        log_success "Configuración de battery corregida"
     fi
     # Eliminar cualquier línea 'style = ...' dentro de [battery]
     if grep -q '^\[battery\]' "$starship_config"; then
-        log_info "Removing battery style warnings..."
+        log_info "Eliminando advertencias de estilo de battery..."
         # Buscar el bloque [battery] y eliminar líneas style = ... dentro de ese bloque
         awk '
         BEGIN {in_battery=0}
@@ -601,15 +600,15 @@ EOF
         in_battery && /^style[ ]*=/ {next}
         {print}
         ' "$starship_config" > "$starship_config.tmp" && mv "$starship_config.tmp" "$starship_config"
-        log_success "Battery style warnings removed"
+        log_success "Advertencias de estilo de battery eliminadas"
     fi
     
     # Verificar que el prompt funcione
     if starship prompt --status 0 >/dev/null 2>&1; then
-        log_success "Starship prompt working correctly"
+        log_success "Prompt de Starship funcionando correctamente"
         return 0
     else
-        log_error "Starship prompt still not working"
+        log_error "Prompt de Starship aún no funciona"
         return 1
     fi
 }
@@ -629,9 +628,9 @@ comprehensive_logging() {
     # Resumen final
     local total_errors=$((system_errors + starship_errors))
     if [[ $total_errors -eq 0 ]]; then
-        log_result true "Error check"
+        log_result true "Verificación de errores"
     else
-        log_result false "Error check ($total_errors issues)"
+        log_result false "Verificación de errores ($total_errors problema(s))"
     fi
 }
 
@@ -663,7 +662,7 @@ validate_system() {
         exit 1
     fi
     
-            log_result true "System validated"
+    log_result true "Sistema validado"
     export OMZ_FOUND="$omz_found"
 }
 
@@ -678,7 +677,7 @@ create_backup() {
     export MIGRATION_BACKUP_PATH="$backup_dir"
 
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Would create backup at: $backup_dir"
+        log_warn "[DRY-RUN] Se crearía un backup en: $backup_dir"
         return
     fi
     
@@ -700,7 +699,7 @@ create_backup() {
         cp "$HOME/.config/starship.toml" "$backup_dir/"
     fi
     
-            log_result true "Backup created"
+            log_result true "Backup creado"
 }
 
 # Analiza el .zshrc para extraer configuraciones personales.
@@ -806,14 +805,14 @@ analyze_config() {
 
     # Exportar los contadores para el mensaje final.
     export COUNT_ALIASES COUNT_EXPORTS COUNT_FUNCTIONS
-            log_result true "Configuration analyzed ($COUNT_ALIASES aliases, $COUNT_EXPORTS exports, $COUNT_FUNCTIONS functions)"
+    log_result true "Configuración analizada ($COUNT_ALIASES alias, $COUNT_EXPORTS exports, $COUNT_FUNCTIONS funciones)"
 }
 
 # Selección de plugins de Zsh
 select_zsh_plugins() {
     if [[ "$AUTO_MODE" = true ]]; then
         # Modo automático: instalar todos los plugins por defecto
-        log_info "Auto mode: installing all plugins by default"
+        log_info "Modo automático: instalando todos los plugins por defecto"
         INSTALL_AUTOSUGGESTIONS=true
         INSTALL_SYNTAX_HIGHLIGHTING=true
         INSTALL_COMPLETIONS=true
@@ -824,7 +823,7 @@ select_zsh_plugins() {
         # Modo interactivo: usar GUI moderna
         check_gui_dependencies
         
-        log_info "Zsh plugins configuration:"
+        log_info "Configuración de plugins de Zsh:"
         
         local selected_plugins=$(show_gui_multi_select \
             "Plugins de Zsh" \
@@ -913,7 +912,7 @@ handle_dependencies() {
 select_starship_features() {
     if [[ "$AUTO_MODE" = true ]]; then
         # Modo automático: seleccionar todas las opciones sin interacción
-        log_info "Auto mode: applying complete configuration by default"
+        log_info "Modo automático: aplicando configuración completa por defecto"
         STARSHIP_THEME="Pastel Powerline"
         STARSHIP_BLANK_LINE=true
         STARSHIP_GIT=true
@@ -949,7 +948,7 @@ select_starship_features() {
         # Modo interactivo: usar GUI moderna
         check_gui_dependencies
         
-        log_info "Starship customization configuration:"
+        log_info "Configuración de personalizaciones de Starship:"
         
         # Selección de módulos básicos
         local basic_modules=$(show_gui_multi_select \
@@ -1157,17 +1156,17 @@ install_dependencies() {
     # 1. Starship
     local starship_installed=true
     if ! command -v starship >/dev/null; then
-        if [[ "$DRY_RUN" = true ]]; then
-            log_warn "[DRY-RUN] Would run: brew install starship"
-        else
-            brew install starship >/dev/null && starship_installed=true || starship_installed=false
-        fi
+            if [[ "$DRY_RUN" = true ]]; then
+        log_warn "[DRY-RUN] Se ejecutaría: brew install starship"
+    else
+        brew install starship >/dev/null && starship_installed=true || starship_installed=false
+    fi
     fi
 
     # 2. Plugins de Zsh
     local plugins_installed=true
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Would clone plugin repositories in $ZSH_PLUGINS_DIR"
+        log_warn "[DRY-RUN] Se clonarían los repositorios de plugins en $ZSH_PLUGINS_DIR"
     else
         # Verificar que el directorio de plugins existe y es escribible
         if [[ ! -d "$ZSH_PLUGINS_DIR" ]]; then
@@ -1175,7 +1174,7 @@ install_dependencies() {
         fi
         
         if [[ ! -w "$ZSH_PLUGINS_DIR" ]]; then
-            log_error "Directory $ZSH_PLUGINS_DIR is not writable"
+            log_error "El directorio $ZSH_PLUGINS_DIR no es escribible"
             plugins_installed=false
         else
             # Instalar plugins
@@ -1211,7 +1210,7 @@ install_dependencies() {
     # 3. Modern CLI tools (condicional)
     local tools_installed=true
     if [[ "$SKIP_TOOLS" = true ]]; then
-        # Se omite la instalación de herramientas modernas
+        log_verbose "Se omite la instalación de herramientas modernas (--skip-tools)."
     else
         local tools_to_install=()
         [[ "$INSTALL_EZA" = true ]] && ! command -v eza >/dev/null && tools_to_install+=("eza")
@@ -1222,7 +1221,7 @@ install_dependencies() {
         
         if [[ ${#tools_to_install[@]} -gt 0 ]]; then
             if [[ "$DRY_RUN" = true ]]; then
-                log_warn "[DRY-RUN] Would run: brew install ${tools_to_install[*]}"
+                log_warn "[DRY-RUN] Se ejecutaría: brew install ${tools_to_install[*]}"
             else
                 brew install ${tools_to_install[@]} >/dev/null || tools_installed=false
             fi
@@ -1235,9 +1234,9 @@ install_dependencies() {
     fi
     
     # Mostrar resultados
-    log_result "$starship_installed" "Starship installation"
-    log_result "$plugins_installed" "Plugins installation"
-    log_result "$tools_installed" "Tools installation"
+    log_result "$starship_installed" "Instalación Starship"
+    log_result "$plugins_installed" "Instalación plugins"
+    log_result "$tools_installed" "Instalación herramientas"
     
     set -e  # Restaurar 'set -e' al final de la función
 }
@@ -1681,8 +1680,8 @@ EOF
     fi
 
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Would create ~/.zshrc.new and validate it."
-        log_warn "[DRY-RUN] Would create ~/.config/starship.toml."
+        log_warn "[DRY-RUN] Se crearía ~/.zshrc.new y se validaría."
+        log_warn "[DRY-RUN] Se crearía ~/.config/starship.toml."
         return
     fi
     
@@ -1694,7 +1693,7 @@ EOF
     if zsh -n "$HOME/.zshrc.new"; then
         mv "$HOME/.zshrc.new" "$HOME/.zshrc"
     else
-        log_error "Generated .zshrc has syntax error. Aborting to prevent issues."
+        log_error "El .zshrc generado tiene un error de sintaxis. Abortando para prevenir problemas."
         rm "$HOME/.zshrc.new"
         exit 1
     fi
@@ -1703,8 +1702,8 @@ EOF
     mkdir -p "$HOME/.config"
     echo -e "$starship_config_content" > "$starship_config_path"
     
-    log_result "$zshrc_ok" ".zshrc generation"
-    log_result "$starship_ok" "Starship generation"
+    log_result "$zshrc_ok" "Generación .zshrc"
+    log_result "$starship_ok" "Generación Starship"
 }
 
 # Restaura la configuración desde el último backup.
@@ -1714,12 +1713,12 @@ rollback_migration() {
     latest_backup=$(find "$BACKUP_BASE_DIR" -maxdepth 1 -type d -name "20*" | sort -r | head -n 1)
 
     if [[ -z "$latest_backup" ]]; then
-        log_error "No backups found in $BACKUP_BASE_DIR. Cannot perform rollback."
+        log_error "No se encontraron backups en $BACKUP_BASE_DIR. No se puede hacer rollback."
         exit 1
     fi
 
     if [[ "$DRY_RUN" = true ]]; then
-        log_warn "[DRY-RUN] Would restore files from $latest_backup."
+        log_warn "[DRY-RUN] Se restaurarían los archivos desde $latest_backup."
         return
     fi
 
@@ -1743,8 +1742,8 @@ rollback_migration() {
         rm -f "$HOME/.config/starship.toml"
     fi
     
-    log_result true "Rollback completed"
-                log_info "Restart your terminal or run 'source ~/.zshrc'"
+    log_result true "Rollback completado"
+    log_info "Reinicia tu terminal o ejecuta 'source ~/.zshrc'"
 }
 
 # Muestra el estado actual de la configuración de forma simplificada
@@ -1934,14 +1933,18 @@ post_migration_validation() {
         echo -e "  ${C_RED}❌ Tools FAIL${C_NC}"
     fi
     
-    # Success rate
+    # Resumen de validación
+    echo -e "\n${C_BLUE}Resumen de validación:${C_NC}"
+    echo -e "  ${C_GREEN}$passed_checks OK${C_NC}  ${C_RED}$((total_checks - passed_checks)) FAIL${C_NC}"
+    
+    # Determinar si la validación fue exitosa (al menos 80% de éxito)
     local success_rate=$((passed_checks * 100 / total_checks))
     
     if [[ $success_rate -ge 80 ]]; then
-        log_result true "Final validation ($success_rate%)"
+        log_result true "Validación final ($success_rate%)"
         return 0
     else
-        log_result false "Final validation ($success_rate%)"
+        log_result false "Validación final ($success_rate%)"
         return 1
     fi
 }
@@ -1982,26 +1985,26 @@ main() {
                 ;;
             rollback|status|report)
                 if [[ -n "$command" ]]; then
-                    log_error "Only one command can be specified at a time."
+                    log_error "Solo se puede especificar un comando a la vez."
                     exit 1
                 fi
                 command=$1
                 shift
                 ;;
-            -*) # Capture any other unrecognized option
-                log_error "Unrecognized option: $1"
+            -*) # Captura cualquier otra opción no reconocida
+                log_error "Opción no reconocida: $1"
                 show_help
                 exit 1
                 ;;
             *) # Captura argumentos que no son opciones
                 if [[ -z "$command" ]]; then
                     # Si no hay comando, esto es un error.
-                    log_error "Unrecognized command: $1"
+                    log_error "Comando no reconocido: $1"
                     show_help
                     exit 1
                 else
                     # Si ya hay un comando, es un argumento extra no esperado.
-                    log_error "Unexpected argument: $1 for command '$command'"
+                    log_error "Argumento inesperado: $1 para el comando '$command'"
                     exit 1
                 fi
                 ;;
@@ -2013,7 +2016,7 @@ main() {
         # Activar verbose en dry-run es útil para ver qué se haría.
         VERBOSE=true
         set +e  # <--- PATCH: Disable exit on error in dry-run mode
-        log_info "DRY-RUN mode activated. No changes will be made."
+        log_info "Modo DRY-RUN activado. No se realizarán cambios."
     fi
 
     # Mostrar estado antes de cualquier acción, excepto en status, help, rollback
@@ -2026,9 +2029,9 @@ main() {
 
     # Mostrar el modo de ejecución
     if [[ "$AUTO_MODE" = true ]]; then
-        log_info "🚀 Running in AUTO mode (non-interactive)"
+        log_info "🚀 Ejecutando en modo AUTOMÁTICO (no interactivo)"
     else
-        log_info "🎯 Running in INTERACTIVE mode"
+        log_info "🎯 Ejecutando en modo INTERACTIVO"
     fi
     
     # Validación automática del prompt (excepto para comandos específicos)
@@ -2041,11 +2044,11 @@ main() {
             if [[ -f "$HOME/.config/starship.toml" ]]; then
                 log_verbose "🔍 Verificando estado del prompt..."
                 if grep -q '^format = ""' "$HOME/.config/starship.toml"; then
-                    log_warn "⚠️  Empty prompt detected - run migration to fix"
+                    log_warn "⚠️  Prompt vacío detectado - ejecuta la migración para corregir"
                 elif ! starship prompt --status 0 >/dev/null 2>&1; then
-                    log_warn "⚠️  Prompt issues detected - run migration to fix"
+                    log_warn "⚠️  Problemas con el prompt detectados - ejecuta la migración para corregir"
                 else
-                    log_verbose "✅ Prompt working correctly"
+                    log_verbose "✅ Prompt funcionando correctamente"
                 fi
             fi
             ;;
@@ -2054,10 +2057,10 @@ main() {
             # Confirmación final en modo interactivo
         if [[ "$AUTO_MODE" != true ]]; then
             if show_gui_confirmation \
-                "Do you want to continue with the migration?\n\nThe following changes will be made:\n• Backup of current configuration\n• Installation of Starship and plugins\n• Configuration of new prompt\n• Installation of modern tools"; then
-                log_info "User confirmed migration"
+                "¿Deseas continuar con la migración?\n\nSe realizarán los siguientes cambios:\n• Backup de configuración actual\n• Instalación de Starship y plugins\n• Configuración de nuevo prompt\n• Instalación de herramientas modernas"; then
+                log_info "Usuario confirmó la migración"
             else
-                log_info "Migration cancelled by user"
+                log_info "Migración cancelada por el usuario"
                 exit 0
             fi
         fi
@@ -2086,58 +2089,58 @@ main() {
             # Paso 2: Selección de features/configuraciones de Starship
             select_starship_features
             
-            # === SYSTEM VALIDATION ===
-            echo -e "\n${C_BLUE}📋 SYSTEM VALIDATION${C_NC}"
+            # === VALIDACIÓN DEL SISTEMA ===
+            echo -e "\n${C_BLUE}📋 VALIDACIÓN DEL SISTEMA${C_NC}"
             validate_system || MIGRATION_OK=false
-            detect_common_issues || log_verbose "Issues detected, will be fixed automatically"
+            detect_common_issues || log_verbose "Problemas detectados, se solucionarán automáticamente"
             
-            # === BACKUP & ANALYSIS ===
-            echo -e "\n${C_BLUE}💾 BACKUP & ANALYSIS${C_NC}"
-            create_backup && BACKUP_OK=true || log_error "Backup error"
-            analyze_config && ANALYZE_OK=true || log_error "Analysis error"
+            # === BACKUP Y ANÁLISIS ===
+            echo -e "\n${C_BLUE}💾 BACKUP Y ANÁLISIS${C_NC}"
+            create_backup && BACKUP_OK=true || log_error "Error en backup"
+            analyze_config && ANALYZE_OK=true || log_error "Error en análisis"
             
-            # === INSTALLATION ===
-            echo -e "\n${C_BLUE}⚙️  INSTALLATION${C_NC}"
-            install_dependencies && INSTALL_OK=true || log_error "Installation error"
+            # === INSTALACIÓN ===
+            echo -e "\n${C_BLUE}⚙️  INSTALACIÓN${C_NC}"
+            install_dependencies && INSTALL_OK=true || log_error "Error en instalación"
             
-            # === CONFIGURATION ===
-            echo -e "\n${C_BLUE}🔧 CONFIGURATION${C_NC}"
-            generate_new_config && CONFIG_OK=true || log_error "Configuration error"
-            fix_common_issues || log_verbose "Some common issues could not be fixed"
+            # === CONFIGURACIÓN ===
+            echo -e "\n${C_BLUE}🔧 CONFIGURACIÓN${C_NC}"
+            generate_new_config && CONFIG_OK=true || log_error "Error en configuración"
+            fix_common_issues || log_verbose "Algunos problemas comunes no se pudieron solucionar"
             
-            # === VALIDATION ===
-            echo -e "\n${C_BLUE}🔍 VALIDATION${C_NC}"
-            log_info "Validating Starship prompt..."
+            # === VALIDACIÓN ===
+            echo -e "\n${C_BLUE}🔍 VALIDACIÓN${C_NC}"
+            log_info "Validando prompt de Starship..."
             if ! validate_starship_config; then
-                log_warn "Prompt issues detected - fixing automatically"
+                log_warn "Problemas detectados en el prompt - corrigiendo automáticamente"
                 fix_starship_format
-                # Revalidate after fix
+                # Revalidar después de la corrección
                 if validate_starship_config; then
-                    log_success "Prompt fixed and working"
+                    log_success "Prompt corregido y funcionando"
                 else
-                    log_error "Could not fix prompt automatically"
+                    log_error "No se pudo corregir el prompt automáticamente"
                 fi
             else
-                log_success "Starship prompt working correctly"
+                log_success "Prompt de Starship funcionando correctamente"
             fi
             
             post_migration_validation && VALIDATION_OK=true || VALIDATION_OK=false
             
-            # === FINISH ===
-            echo -e "\n${C_BLUE}🎯 FINISH${C_NC}"
+            # === FINALIZACIÓN ===
+            echo -e "\n${C_BLUE}🎯 FINALIZACIÓN${C_NC}"
             # Logging completo del sistema
             comprehensive_logging
             
             # Resumen final simplificado
             if [[ "$BACKUP_OK" = true && "$ANALYZE_OK" = true && "$INSTALL_OK" = true && "$CONFIG_OK" = true && "$VALIDATION_OK" = true ]]; then
-                echo -e "\n${C_GREEN}🎉 Migration completed successfully!${C_NC}"
-                echo -e "   - Backup created at: ${C_YELLOW}${MIGRATION_BACKUP_PATH}${C_NC}"
-                echo -e "   - To revert, run: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
-                echo -e "   - ${C_BLUE}Please restart your terminal or run 'source ~/.zshrc' to see changes.${C_NC}"
+                echo -e "\n${C_GREEN}🎉 ¡Migración completada con éxito!${C_NC}"
+                echo -e "   - Backup creado en: ${C_YELLOW}${MIGRATION_BACKUP_PATH}${C_NC}"
+                echo -e "   - Para revertir, ejecuta: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
+                echo -e "   - ${C_BLUE}Por favor, reinicia tu terminal o ejecuta 'source ~/.zshrc' para ver los cambios.${C_NC}"
             else
-                echo -e "\n${C_RED}❌ Migration incomplete${C_NC}"
-                echo -e "   - Check previous errors"
-                echo -e "   - To revert, run: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
+                echo -e "\n${C_RED}❌ Migración incompleta${C_NC}"
+                echo -e "   - Revisa los errores anteriores"
+                echo -e "   - Para revertir, ejecuta: ${C_YELLOW}./zsh_starship_migration.sh rollback${C_NC}"
             fi
             ;;
     esac
